@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
     <main
-      className="flex flex-col items-center justify-center bg-gradient-to-b from-red-500 to-red-700"
+      className="flex flex-col items-center justify-center bg-pokeballs"
       style={{ minHeight: '100dvh' }}
     >
       <div className="bg-white rounded-3xl p-12 text-center shadow-2xl mx-5 w-full max-w-sm">
