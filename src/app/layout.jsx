@@ -5,12 +5,17 @@ export const metadata = {
   description: '生年月日からあなたのポケモンを診断！',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#ef4444',
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="ja">
-      <body className="min-h-screen">
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

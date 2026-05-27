@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useEffect, useCallback } from 'react';
 
-const ITEM_HEIGHT = 56;
+const ITEM_HEIGHT = 64;
 
 export default function ScrollPicker({ items, value, onChange, width = 72 }) {
   const containerRef = useRef(null);
@@ -39,14 +39,14 @@ export default function ScrollPicker({ items, value, onChange, width = 72 }) {
         ref={containerRef}
         onScroll={handleScroll}
         className="absolute inset-0 overflow-y-scroll no-scrollbar"
-        style={{ scrollSnapType: 'y mandatory', zIndex: 2 }}
+        style={{ scrollSnapType: 'y mandatory', zIndex: 2, touchAction: 'pan-y' }}
       >
         <div style={{ height: ITEM_HEIGHT }} />
         {items.map((item) => (
           <div
             key={item.value}
             style={{ height: ITEM_HEIGHT, scrollSnapAlign: 'center' }}
-            className={`flex items-center justify-center text-xl font-bold select-none
+            className={`flex items-center justify-center text-2xl font-bold select-none
               ${item.value === value ? 'text-gray-800' : 'text-gray-400'}`}
           >
             {item.label}
@@ -54,7 +54,7 @@ export default function ScrollPicker({ items, value, onChange, width = 72 }) {
         ))}
         <div style={{ height: ITEM_HEIGHT }} />
       </div>
-      {/* Fade gradient to blend into card background */}
+      {/* Fade gradient */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
