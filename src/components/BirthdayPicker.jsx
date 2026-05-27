@@ -1,7 +1,7 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ScrollPicker from './ScrollPicker';
-import PokemonResult from './PokemonResult';
 
 const YEARS = Array.from({ length: 2025 - 1940 + 1 }, (_, i) => {
   const y = 1940 + i;
@@ -30,15 +30,11 @@ export default function BirthdayPicker() {
   const [year, setYear] = useState(1990);
   const [month, setMonth] = useState(2);
   const [day, setDay] = useState(13);
-  const [result, setResult] = useState(null);
-  const resultRef = useRef(null);
+  const router = useRouter();
 
   const handleStart = () => {
-    const calc = calcPokemonId(year, month, day);
-    setResult({ ...calc, ts: Date.now() });
-    setTimeout(() => {
-      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 100);
+    const { id, yearSuffix, dateNum, raw } = calcPokemonId(year, month, day);
+    router.push(`/result?id=${id}&ys=${yearSuffix}&dn=${dateNum}&raw=${raw}`);
   };
 
   return (
@@ -87,12 +83,6 @@ export default function BirthdayPicker() {
           スタート！
         </button>
       </div>
-
-      {result && (
-        <div ref={resultRef} className="mt-6 w-full max-w-sm">
-          <PokemonResult key={result.ts} {...result} />
-        </div>
-      )}
     </main>
   );
 }
