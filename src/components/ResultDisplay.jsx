@@ -16,7 +16,7 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
     // Background
     const grad = ctx.createLinearGradient(0, 0, 0, H);
     grad.addColorStop(0, '#fff1f1');
-    grad.addColorStop(0.35, '#ffffff');
+    grad.addColorStop(0.4, '#ffffff');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
@@ -29,19 +29,19 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
         img.onerror = resolve;
         img.src = sprite;
       });
-      const size = 300;
-      ctx.drawImage(img, (W - size) / 2, 80, size, size);
+      const size = 310;
+      ctx.drawImage(img, (W - size) / 2, 75, size, size);
     }
 
     // No.
     ctx.fillStyle = '#9ca3af';
     ctx.textAlign = 'center';
     ctx.font = 'bold 24px sans-serif';
-    ctx.fillText(`No.${paddedId}`, W / 2, 55);
+    ctx.fillText(`No.${paddedId}`, W / 2, 52);
 
-    // Pokemon name (auto-shrink for long names)
+    // Pokemon name（長い名前は自動縮小）
     ctx.fillStyle = '#111827';
-    let fontSize = 60;
+    let fontSize = 62;
     ctx.font = `bold ${fontSize}px sans-serif`;
     while (ctx.measureText(jaName).width > W - 60 && fontSize > 24) {
       fontSize -= 4;
@@ -52,9 +52,8 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
     // Watermark
     ctx.fillStyle = '#d1d5db';
     ctx.font = '15px sans-serif';
-    ctx.fillText('ポケモン誕生日診断', W / 2, 620);
+    ctx.fillText('ポケモン誕生日診断', W / 2, 625);
 
-    // Download
     const link = document.createElement('a');
     link.download = `pokemon-${paddedId}.png`;
     link.href = canvas.toDataURL('image/png');
@@ -62,52 +61,65 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-red-500 to-red-700 flex flex-col items-center px-4 py-10">
-      <div className="w-full max-w-sm mb-4">
+    <main
+      className="flex flex-col bg-gradient-to-b from-red-500 to-red-700"
+      style={{ minHeight: '100dvh' }}
+    >
+      {/* トップバー：ノッチ余白 + 戻るリンク + 計算式 */}
+      <div
+        className="px-5 pb-3"
+        style={{ paddingTop: 'max(2.5rem, env(safe-area-inset-top))' }}
+      >
         <Link
           href="/"
-          className="text-white/80 hover:text-white text-sm font-medium flex items-center gap-1"
+          className="inline-flex items-center gap-1 text-white/80 text-sm font-medium mb-3"
         >
           ← 戻る
         </Link>
-      </div>
-
-      <p className="text-red-200 text-xs font-mono mb-4">
-        {ys} + {dn} = {raw}
-        {raw > 1025 && ` → ${raw} − 1025 = ${id}`}
-      </p>
-
-      {/* Result card */}
-      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm text-center">
-        {/* No. */}
-        <p className="text-gray-400 font-mono font-bold text-lg mb-4">
-          No.{paddedId}
+        <p className="text-red-200 text-xs font-mono text-center">
+          {ys} + {dn} = {raw}
+          {raw > 1025 && ` → ${raw} − 1025 = ${id}`}
         </p>
-
-        {/* Pokemon image */}
-        {sprite && (
-          <div className="relative w-56 h-56 mx-auto mb-6">
-            <Image
-              src={sprite}
-              alt={jaName}
-              fill
-              className="object-contain drop-shadow-2xl"
-              unoptimized
-            />
-          </div>
-        )}
-
-        {/* Japanese name */}
-        <h1 className="text-4xl font-black text-gray-800 tracking-tight">{jaName}</h1>
       </div>
 
-      {/* Save button — outside the card, not included in canvas */}
-      <button
-        onClick={handleSave}
-        className="mt-5 w-full max-w-sm bg-white hover:bg-gray-50 active:scale-95 text-gray-800 font-bold text-lg py-4 rounded-2xl shadow-lg transition-all duration-150"
+      {/* 結果カード：残りの高さを埋めて縦中央に */}
+      <div className="flex-1 flex items-center px-5 py-2">
+        <div className="w-full bg-white rounded-3xl shadow-xl p-6 text-center">
+          {/* No. */}
+          <p className="text-gray-400 font-mono font-bold text-base mb-3">
+            No.{paddedId}
+          </p>
+
+          {/* ポケモン画像：カード幅いっぱいに大きく */}
+          {sprite && (
+            <div className="relative w-full aspect-square mx-auto mb-4" style={{ maxWidth: 300 }}>
+              <Image
+                src={sprite}
+                alt={jaName}
+                fill
+                className="object-contain drop-shadow-2xl"
+                unoptimized
+              />
+            </div>
+          )}
+
+          {/* 日本語名 */}
+          <h1 className="text-4xl font-black text-gray-800 tracking-tight">{jaName}</h1>
+        </div>
+      </div>
+
+      {/* 保存ボタン：ホームバー余白 */}
+      <div
+        className="px-5 pt-4"
+        style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
       >
-        画像を保存する
-      </button>
+        <button
+          onClick={handleSave}
+          className="w-full bg-white text-gray-800 font-bold text-lg py-5 rounded-2xl shadow-lg active:scale-95 transition-transform duration-100"
+        >
+          画像を保存する
+        </button>
+      </div>
     </main>
   );
 }

@@ -38,47 +38,63 @@ export default function BirthdayPicker() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-red-500 to-red-700 flex flex-col items-center px-4 py-10">
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-black text-white drop-shadow-lg tracking-tight mb-2">
+    <main
+      className="flex flex-col bg-gradient-to-b from-red-500 to-red-700"
+      style={{ minHeight: '100dvh' }}
+    >
+      {/* ヘッダー：ノッチ分の余白 + タイトル */}
+      <div
+        className="text-center px-6 pb-5"
+        style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))' }}
+      >
+        <h1 className="text-3xl font-black text-white tracking-tight drop-shadow mb-1">
           ポケモン誕生日診断
         </h1>
-        <p className="text-red-100 text-sm">
-          生年月日からあなたのポケモンを見つけよう！
-        </p>
+        <p className="text-red-100 text-sm">生年月日からあなたのポケモンを見つけよう！</p>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm">
-        <p className="text-center text-gray-400 text-xs tracking-widest mb-5">生 年 月 日 を 選 択</p>
+      {/* ピッカーカード：残りの高さを埋めて縦中央に */}
+      <div className="flex-1 flex items-center px-5">
+        <div className="w-full bg-white rounded-3xl shadow-xl p-6">
+          <p className="text-center text-gray-400 text-xs tracking-widest mb-5">
+            生 年 月 日 を 選 択
+          </p>
 
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <div className="flex flex-col items-center gap-1">
-            <ScrollPicker items={YEARS} value={year} onChange={setYear} width={100} />
-            <span className="text-xs font-semibold text-gray-400">年</span>
+          <div className="flex items-center justify-center gap-2 mb-5">
+            <div className="flex flex-col items-center gap-1">
+              <ScrollPicker items={YEARS} value={year} onChange={setYear} width={96} />
+              <span className="text-xs font-semibold text-gray-400">年</span>
+            </div>
+
+            <span className="text-gray-300 text-xl mb-6 select-none">·</span>
+
+            <div className="flex flex-col items-center gap-1">
+              <ScrollPicker items={MONTHS} value={month} onChange={setMonth} width={62} />
+              <span className="text-xs font-semibold text-gray-400">月</span>
+            </div>
+
+            <span className="text-gray-300 text-xl mb-6 select-none">·</span>
+
+            <div className="flex flex-col items-center gap-1">
+              <ScrollPicker items={DAYS} value={day} onChange={setDay} width={62} />
+              <span className="text-xs font-semibold text-gray-400">日</span>
+            </div>
           </div>
 
-          <span className="text-gray-200 text-2xl mb-6 select-none">·</span>
-
-          <div className="flex flex-col items-center gap-1">
-            <ScrollPicker items={MONTHS} value={month} onChange={setMonth} width={60} />
-            <span className="text-xs font-semibold text-gray-400">月</span>
-          </div>
-
-          <span className="text-gray-200 text-2xl mb-6 select-none">·</span>
-
-          <div className="flex flex-col items-center gap-1">
-            <ScrollPicker items={DAYS} value={day} onChange={setDay} width={60} />
-            <span className="text-xs font-semibold text-gray-400">日</span>
-          </div>
+          <p className="text-center text-gray-600 font-bold text-xl">
+            {year}年{month}月{day}日
+          </p>
         </div>
+      </div>
 
-        <p className="text-center text-gray-600 font-bold text-lg mb-5">
-          {year}年 {month}月 {day}日
-        </p>
-
+      {/* ボタン：ホームバー分の余白 */}
+      <div
+        className="px-5 pt-5"
+        style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+      >
         <button
           onClick={handleStart}
-          className="w-full bg-red-500 hover:bg-red-600 active:scale-95 text-white font-black text-xl py-4 rounded-2xl shadow-lg transition-all duration-150"
+          className="w-full bg-white text-red-500 font-black text-xl py-5 rounded-2xl shadow-lg active:scale-95 transition-transform duration-100"
         >
           スタート！
         </button>
