@@ -62,7 +62,7 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
 
   return (
     <main
-      className="flex flex-col bg-gradient-to-b from-red-500 to-red-700"
+      className="flex flex-col bg-pokeballs"
       style={{ minHeight: '100dvh' }}
     >
       {/* トップバー：ノッチ余白 + 戻るリンク + 計算式 */}
@@ -72,11 +72,12 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
       >
         <Link
           href="/"
-          className="inline-flex items-center gap-1 text-white/80 text-sm font-medium mb-3"
+          className="inline-flex items-center gap-1 text-white text-sm font-medium mb-3"
+          style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
         >
           ← 戻る
         </Link>
-        <p className="text-red-200 text-xs font-mono text-center">
+        <p className="text-white text-xs font-mono text-center" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>
           {ys} + {dn} = {raw}
           {raw > 1025 && ` → ${raw} − 1025 = ${id}`}
         </p>

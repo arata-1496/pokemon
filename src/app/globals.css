@@ -16,3 +16,10 @@ button {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.bg-pokeballs {
+  background-color: #f48a9c;
+  background-image: url('/pokeball-bg.svg');
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}

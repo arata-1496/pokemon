@@ -39,7 +39,7 @@ export default function BirthdayPicker() {
 
   return (
     <main
-      className="flex flex-col bg-gradient-to-b from-red-500 to-red-700"
+      className="flex flex-col bg-pokeballs"
       style={{ minHeight: '100dvh' }}
     >
       {/* ヘッダー：ノッチ分の余白 + タイトル */}
@@ -47,10 +47,10 @@ export default function BirthdayPicker() {
         className="text-center px-6 pb-5"
         style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))' }}
       >
-        <h1 className="text-3xl font-black text-white tracking-tight drop-shadow mb-1">
+        <h1 className="text-3xl font-black text-white tracking-tight mb-1" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.35)' }}>
           ポケモン誕生日診断
         </h1>
-        <p className="text-red-100 text-sm">生年月日からあなたのポケモンを見つけよう！</p>
+        <p className="text-white text-sm" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>生年月日からあなたのポケモンを見つけよう！</p>
       </div>
 
       {/* ピッカーカード：残りの高さを埋めて縦中央に */}
