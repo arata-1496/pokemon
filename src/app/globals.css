@@ -18,8 +18,29 @@ button {
 }
 
 .bg-pokeballs {
+  position: relative;
+  overflow: hidden;
   background-color: #f48a9c;
-  background-image: url('/pokeball-bg.svg');
+  isolation: isolate;
+}
+.bg-pokeballs::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -260px;
+  right: -260px;
+  background-image: url('/pokeball-bg.jpg');
   background-repeat: repeat;
-  background-size: 200px 200px;
+  background-size: 260px auto;
+  animation: scroll-bg 18s linear infinite;
+  z-index: -1;
+  will-change: transform;
+}
+@keyframes scroll-bg {
+  from { transform: translateX(0); }
+  to { transform: translateX(-260px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-pokeballs::before { animation: none; }
 }
