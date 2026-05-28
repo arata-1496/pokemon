@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ScrollPicker from './ScrollPicker';
 
 const YEARS = Array.from({ length: 2025 - 1940 + 1 }, (_, i) => {
@@ -98,6 +99,13 @@ export default function BirthdayPicker() {
         >
           スタート！
         </button>
+        <Link
+          href="/pokedex"
+          className="block text-center text-white/80 text-sm font-medium mt-3"
+          style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
+        >
+          図鑑を見る →
+        </Link>
       </div>
     </main>
   );
