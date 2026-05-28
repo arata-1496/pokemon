@@ -111,7 +111,7 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
       {/* ボタンエリア：ホームバー余白 */}
       <div
         className="px-5 pt-4 space-y-3"
-        style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'max(5rem, calc(3.5rem + env(safe-area-inset-bottom)))' }}
       >
         <Link
           href={`/pokemon/${id}`}

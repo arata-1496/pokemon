@@ -86,14 +86,26 @@ export function collectEvoItemNames(node) {
   return items;
 }
 
-export function getEvoCondition(detail, itemNameMap = {}) {
+// Collect known_move name→url pairs from raw evo chain
+export function collectEvoMoveUrls(node) {
+  const moves = new Map();
+  for (const d of node.evolution_details ?? []) {
+    if (d.known_move?.name) moves.set(d.known_move.name, d.known_move.url);
+  }
+  for (const child of node.evolves_to ?? []) {
+    for (const [name, url] of collectEvoMoveUrls(child)) moves.set(name, url);
+  }
+  return moves;
+}
+
+export function getEvoCondition(detail, itemNameMap = {}, moveNameMap = {}) {
   if (!detail) return null;
   if (detail.min_level) return `Lv.${detail.min_level}`;
   if (detail.item) return itemNameMap[detail.item.name] ?? detail.item.name;
   if (detail.held_item) return `${itemNameMap[detail.held_item.name] ?? detail.held_item.name}を持って交換`;
   if (detail.trigger?.name === 'trade') return '通信交換';
   if (detail.min_happiness) return 'なつき度';
-  if (detail.known_move) return `${detail.known_move.name}を習得`;
+  if (detail.known_move) return `${moveNameMap[detail.known_move.name] ?? detail.known_move.name}を習得`;
   if (detail.location) return '特定の場所';
   return null;
 }

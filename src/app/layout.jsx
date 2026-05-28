@@ -1,5 +1,6 @@
 import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
+import TabBar from '@/components/TabBar';
 
 export const metadata = {
   title: 'ポケモン誕生日診断',
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
       <body>
         {children}
         <Analytics />
+        <TabBar />
       </body>
     </html>
   );

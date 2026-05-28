@@ -1,10 +1,17 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Fragment } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { officialArtwork } from '@/lib/pokeapi';
 
 const PAGE_SIZE = 60;
+
+function visiblePages(current, total) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const set = new Set([1, total]);
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) set.add(i);
+  return [...set].sort((a, b) => a - b);
+}
 
 export default function PokedexSearch({ list }) {
   const [query, setQuery] = useState('');
@@ -14,7 +21,7 @@ export default function PokedexSearch({ list }) {
     const q = query.trim().toLowerCase();
     if (!q) return list;
     return list.filter(
-      (p) => p.name.includes(q) || String(p.id).includes(q)
+      (p) => p.jaName.includes(q) || p.name.includes(q) || String(p.id).includes(q)
     );
   }, [query, list]);
 
@@ -25,6 +32,8 @@ export default function PokedexSearch({ list }) {
     setQuery(e.target.value);
     setPage(1);
   };
+
+  const pages = visiblePages(page, totalPages);
 
   return (
     <div>
@@ -45,7 +54,7 @@ export default function PokedexSearch({ list }) {
               <div className="relative w-full aspect-square">
                 <Image
                   src={officialArtwork(p.id)}
-                  alt={p.name}
+                  alt={p.jaName}
                   fill
                   className="object-contain drop-shadow"
                   unoptimized
@@ -54,7 +63,7 @@ export default function PokedexSearch({ list }) {
               <p className="text-[10px] text-gray-400 font-mono mt-1">
                 No.{String(p.id).padStart(4, '0')}
               </p>
-              <p className="text-xs font-bold text-gray-700 truncate">{p.name}</p>
+              <p className="text-xs font-bold text-gray-700 truncate">{p.jaName}</p>
             </div>
           </Link>
         ))}
@@ -65,21 +74,37 @@ export default function PokedexSearch({ list }) {
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-3 py-5">
+        <div className="flex justify-center items-center gap-1.5 py-5 flex-wrap px-4">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 bg-white rounded-xl shadow text-sm font-bold text-gray-600 disabled:opacity-40"
+            className="w-9 h-9 bg-white rounded-xl shadow text-sm font-bold text-gray-600 disabled:opacity-40"
           >
             ←
           </button>
-          <span className="text-white text-sm font-bold">
-            {page} / {totalPages}
-          </span>
+
+          {pages.map((n, i) => (
+            <Fragment key={n}>
+              {i > 0 && pages[i - 1] !== n - 1 && (
+                <span className="text-white/70 text-sm w-5 text-center">…</span>
+              )}
+              <button
+                onClick={() => setPage(n)}
+                className={`w-9 h-9 rounded-xl shadow text-sm font-bold transition-colors ${
+                  page === n
+                    ? 'bg-red-500 text-white'
+                    : 'bg-white text-gray-600'
+                }`}
+              >
+                {n}
+              </button>
+            </Fragment>
+          ))}
+
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 bg-white rounded-xl shadow text-sm font-bold text-gray-600 disabled:opacity-40"
+            className="w-9 h-9 bg-white rounded-xl shadow text-sm font-bold text-gray-600 disabled:opacity-40"
           >
             →
           </button>

@@ -1,4 +1,4 @@
-import { fetchPokemonList, getIdFromUrl } from '@/lib/pokeapi';
+import { fetchPokemonList, fetchSpecies, getIdFromUrl, getJaName } from '@/lib/pokeapi';
 import PokedexSearch from '@/components/PokedexSearch';
 import BackButton from '@/components/BackButton';
 
@@ -6,9 +6,17 @@ export const metadata = { title: 'ポケモン図鑑' };
 
 export default async function PokedexPage() {
   const data = await fetchPokemonList(1025, 0);
-  const list = (data?.results ?? []).map((p) => ({
+  const baseList = (data?.results ?? []).map((p) => ({
     id: getIdFromUrl(p.url),
     name: p.name,
+  }));
+
+  // Fetch all species in parallel for Japanese names (cached for 1h)
+  const speciesData = await Promise.all(baseList.map((p) => fetchSpecies(p.id)));
+
+  const list = baseList.map((p, i) => ({
+    ...p,
+    jaName: getJaName(speciesData[i]?.names ?? []) || p.name,
   }));
 
   return (
@@ -30,7 +38,7 @@ export default async function PokedexPage() {
       </div>
       <div
         className="flex-1"
-        style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'max(5rem, calc(3.5rem + env(safe-area-inset-bottom)))' }}
       >
         <PokedexSearch list={list} />
       </div>
