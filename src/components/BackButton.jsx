@@ -6,8 +6,7 @@ export default function BackButton({ label = '← 戻る', className = '' }) {
   return (
     <button
       onClick={() => router.back()}
-      className={`text-white text-sm font-medium ${className}`}
-      style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
+      className={`bg-white/90 text-gray-700 text-sm font-bold px-3 py-1.5 rounded-full shadow-sm ${className}`}
     >
       {label}
     </button>

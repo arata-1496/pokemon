@@ -121,8 +121,7 @@ export default async function PokemonDetailPage({ params }) {
         <BackButton />
         <Link
           href="/pokedex"
-          className="text-white text-sm font-medium"
-          style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
+          className="bg-white/90 text-gray-700 text-sm font-bold px-3 py-1.5 rounded-full shadow-sm"
         >
           図鑑一覧
         </Link>

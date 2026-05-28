@@ -72,8 +72,7 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
       >
         <Link
           href="/"
-          className="inline-flex items-center gap-1 text-white text-sm font-medium mb-3"
-          style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
+          className="inline-flex items-center gap-1 bg-white/90 text-gray-700 text-sm font-bold px-3 py-1.5 rounded-full shadow-sm mb-3"
         >
           ← 戻る
         </Link>
