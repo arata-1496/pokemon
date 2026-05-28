@@ -109,11 +109,17 @@ export default function ResultDisplay({ sprite, name, jaName, id, ys, dn, raw })
         </div>
       </div>
 
-      {/* 保存ボタン：ホームバー余白 */}
+      {/* ボタンエリア：ホームバー余白 */}
       <div
-        className="px-5 pt-4"
+        className="px-5 pt-4 space-y-3"
         style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
       >
+        <Link
+          href={`/pokemon/${id}`}
+          className="block w-full bg-red-500 text-white font-bold text-lg py-5 rounded-2xl shadow-lg text-center active:scale-95 transition-transform duration-100"
+        >
+          詳細を見る
+        </Link>
         <button
           onClick={handleSave}
           className="w-full bg-white text-gray-800 font-bold text-lg py-5 rounded-2xl shadow-lg active:scale-95 transition-transform duration-100"
