@@ -12,6 +12,8 @@ export const fetchSpecies = (id) => get(`${BASE}/pokemon-species/${id}`);
 export const fetchType = (name) => get(`${BASE}/type/${name}`);
 export const fetchMove = (url) => get(url);
 export const fetchEvolutionChain = (url) => get(url);
+export const fetchAbility = (name) => get(`${BASE}/ability/${name}`);
+export const fetchItem = (name) => get(`${BASE}/item/${name}`);
 export const fetchPokemonList = (limit, offset) =>
   get(`${BASE}/pokemon?limit=${limit}&offset=${offset}`);
 
@@ -71,11 +73,24 @@ export function collectChainIds(node) {
   ];
 }
 
-export function getEvoCondition(detail) {
+// Collect all item/held_item names from raw evo chain (before addNamesToChain)
+export function collectEvoItemNames(node) {
+  const items = new Set();
+  for (const d of node.evolution_details ?? []) {
+    if (d.item?.name) items.add(d.item.name);
+    if (d.held_item?.name) items.add(d.held_item.name);
+  }
+  for (const child of node.evolves_to ?? []) {
+    for (const name of collectEvoItemNames(child)) items.add(name);
+  }
+  return items;
+}
+
+export function getEvoCondition(detail, itemNameMap = {}) {
   if (!detail) return null;
   if (detail.min_level) return `Lv.${detail.min_level}`;
-  if (detail.item) return detail.item.name;
-  if (detail.held_item) return `${detail.held_item.name}+交換`;
+  if (detail.item) return itemNameMap[detail.item.name] ?? detail.item.name;
+  if (detail.held_item) return `${itemNameMap[detail.held_item.name] ?? detail.held_item.name}を持って交換`;
   if (detail.trigger?.name === 'trade') return '通信交換';
   if (detail.min_happiness) return 'なつき度';
   if (detail.known_move) return `${detail.known_move.name}を習得`;

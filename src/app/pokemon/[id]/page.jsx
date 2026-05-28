@@ -3,8 +3,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   fetchPokemon, fetchSpecies, fetchType, fetchMove, fetchEvolutionChain,
+  fetchAbility, fetchItem,
   getJaName, getFlavorText, getIdFromUrl, officialArtwork,
-  calcTypeMatchup, addNamesToChain, collectChainIds, getEvoCondition,
+  calcTypeMatchup, addNamesToChain, collectChainIds, collectEvoItemNames, getEvoCondition,
   TYPE_COLORS, STAT_NAMES_JA, DAMAGE_CLASS_JA,
 } from '@/lib/pokeapi';
 import TypeBadge from '@/components/TypeBadge';
@@ -46,9 +47,21 @@ export default async function PokemonDetailPage({ params }) {
   const resx025 = Object.entries(matchup).filter(([, v]) => v === 0.25).map(([k]) => k);
   const immune  = Object.entries(matchup).filter(([, v]) => v === 0).map(([k]) => k);
 
+  // とくせいの日本語名
+  const abilityData = await Promise.all(
+    pokemon.abilities.map((a) => fetchAbility(a.ability.name))
+  );
+  const abilityNameMap = Object.fromEntries(
+    pokemon.abilities.map((a, i) => [
+      a.ability.name,
+      getJaName(abilityData[i]?.names ?? []) || a.ability.name,
+    ])
+  );
+
   // 進化チェーン
   const evoData = await fetchEvolutionChain(species.evolution_chain.url);
   let evoTree = null;
+  let itemNameMap = {};
   if (evoData) {
     const chainIds = collectChainIds(evoData.chain);
     const chainSpecies = await Promise.all(chainIds.map((cid) => fetchSpecies(cid)));
@@ -56,6 +69,18 @@ export default async function PokemonDetailPage({ params }) {
       chainIds.map((cid, i) => [cid, getJaName(chainSpecies[i]?.names ?? [])])
     );
     evoTree = addNamesToChain(evoData.chain, nameMap);
+
+    // 進化アイテムの日本語名
+    const itemNames = [...collectEvoItemNames(evoData.chain)];
+    if (itemNames.length > 0) {
+      const itemData = await Promise.all(itemNames.map((n) => fetchItem(n)));
+      itemNameMap = Object.fromEntries(
+        itemNames.map((n, i) => [
+          n,
+          getJaName(itemData[i]?.names ?? []) || n,
+        ])
+      );
+    }
   }
 
   // わざ（レベルアップ、最大25件）
@@ -151,7 +176,7 @@ export default async function PokemonDetailPage({ params }) {
                     : 'bg-gray-100 text-gray-700'
                 }`}
               >
-                {a.ability.name}
+                {abilityNameMap[a.ability.name] ?? a.ability.name}
                 {a.is_hidden && <span className="text-xs ml-1 opacity-70">(かくれ)</span>}
               </span>
             ))}
@@ -202,7 +227,7 @@ export default async function PokemonDetailPage({ params }) {
         {evoTree && (evoTree.evolvesTo.length > 0 || true) && (
           <Section title="進化">
             <div className="overflow-x-auto">
-              <EvoChain node={evoTree} currentId={numId} />
+              <EvoChain node={evoTree} currentId={numId} itemNameMap={itemNameMap} />
             </div>
           </Section>
         )}
@@ -303,9 +328,9 @@ function MatchupRow({ label, types, color }) {
 }
 
 // 進化チェーン（再帰コンポーネント）
-function EvoChain({ node, currentId }) {
+function EvoChain({ node, currentId, itemNameMap }) {
   const isCurrent = node.id === currentId;
-  const condition = node.details?.[0] ? getEvoCondition(node.details[0]) : null;
+  const condition = node.details?.[0] ? getEvoCondition(node.details[0], itemNameMap) : null;
 
   return (
     <div className="flex flex-col items-center">
@@ -345,7 +370,7 @@ function EvoChain({ node, currentId }) {
       {node.evolvesTo.length > 0 && (
         <div className="flex flex-wrap justify-center gap-2 mt-1">
           {node.evolvesTo.map((child) => (
-            <EvoChain key={child.id} node={child} currentId={currentId} />
+            <EvoChain key={child.id} node={child} currentId={currentId} itemNameMap={itemNameMap} />
           ))}
         </div>
       )}
