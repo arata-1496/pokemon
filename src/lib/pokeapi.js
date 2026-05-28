@@ -73,6 +73,19 @@ export function collectChainIds(node) {
   ];
 }
 
+// Collect item/held_item name→url pairs from raw evo chain
+export function collectEvoItemUrls(node) {
+  const items = new Map();
+  for (const d of node.evolution_details ?? []) {
+    if (d.item?.name) items.set(d.item.name, d.item.url);
+    if (d.held_item?.name) items.set(d.held_item.name, d.held_item.url);
+  }
+  for (const child of node.evolves_to ?? []) {
+    for (const [name, url] of collectEvoItemUrls(child)) items.set(name, url);
+  }
+  return items;
+}
+
 // Collect all item/held_item names from raw evo chain (before addNamesToChain)
 export function collectEvoItemNames(node) {
   const items = new Set();
