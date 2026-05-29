@@ -2,7 +2,7 @@
 import { useState, useMemo, Fragment } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, Check, Sparkles } from 'lucide-react';
 import { officialArtwork } from '@/lib/pokeapi';
 import GlassSelect from '@/components/GlassSelect';
 
@@ -23,20 +23,81 @@ const REGIONS = [
 
 const GAMES = [
   { value: 'all',  label: 'すべて' },
-  { value: 'rby',  label: '赤・緑・青',                       min: 1,   max: 151  },
-  { value: 'gsc',  label: '金・銀・クリスタル',               min: 152, max: 251  },
-  { value: 'rse',  label: 'ルビー・サファイア・エメラルド',   min: 252, max: 386  },
-  { value: 'dppt', label: 'ダイヤモンド・パール・プラチナ',   min: 387, max: 493  },
-  { value: 'hgss', label: 'ハートゴールド・ソウルシルバー',   min: 152, max: 251  },
-  { value: 'bw',   label: 'ブラック・ホワイト',               min: 494, max: 649  },
-  { value: 'bw2',  label: 'ブラック2・ホワイト2',             min: 494, max: 649  },
-  { value: 'xy',   label: 'X・Y',                             min: 650, max: 721  },
-  { value: 'oras', label: 'オメガルビー・アルファサファイア', min: 252, max: 386  },
-  { value: 'sm',   label: 'サン・ムーン',                     min: 722, max: 809  },
-  { value: 'usum', label: 'ウルトラサン・ウルトラムーン',     min: 722, max: 809  },
-  { value: 'ss',   label: 'ソード・シールド',                 min: 810, max: 905  },
-  { value: 'sv',   label: 'スカーレット・バイオレット',       min: 906, max: 1025 },
+  { value: 'rby',  label: '赤・緑・青',                                 min: 1,   max: 151  },
+  { value: 'gsc',  label: '金・銀・クリスタル',                         min: 152, max: 251  },
+  { value: 'rse',  label: 'ルビー・サファイア・エメラルド',             min: 252, max: 386  },
+  { value: 'dppt', label: 'ダイヤモンド・パール・プラチナ',             min: 387, max: 493  },
+  { value: 'hgss', label: 'ハートゴールド・ソウルシルバー',             min: 152, max: 251  },
+  { value: 'bw',   label: 'ブラック・ホワイト',                         min: 494, max: 649  },
+  { value: 'bw2',  label: 'ブラック2・ホワイト2',                       min: 494, max: 649  },
+  { value: 'xy',   label: 'X・Y',                                       min: 650, max: 721  },
+  { value: 'oras', label: 'オメガルビー・アルファサファイア',           min: 252, max: 386  },
+  { value: 'sm',   label: 'サン・ムーン',                               min: 722, max: 809  },
+  { value: 'usum', label: 'ウルトラサン・ウルトラムーン',               min: 722, max: 809  },
+  { value: 'lgpe', label: "Let's Go! ピカチュウ/イーブイ",             min: 1,   max: 151  },
+  { value: 'ss',   label: 'ソード・シールド',                           min: 810, max: 905  },
+  { value: 'bdsp', label: 'ブリリアントダイヤモンド/シャイニングパール', min: 387, max: 493  },
+  { value: 'pla',  label: 'レジェンズ アルセウス',                      min: 1,   max: 905  },
+  { value: 'sv',   label: 'スカーレット・バイオレット',                 min: 906, max: 1025 },
 ];
+
+// All Mega Evolution Pokémon — images use base Pokémon artwork
+const MEGA_LIST = [
+  { baseId: 3,   jaName: 'メガフシギバナ' },
+  { baseId: 6,   jaName: 'メガリザードンX' },
+  { baseId: 6,   jaName: 'メガリザードンY' },
+  { baseId: 9,   jaName: 'メガカメックス' },
+  { baseId: 15,  jaName: 'メガスピアー' },
+  { baseId: 18,  jaName: 'メガピジョット' },
+  { baseId: 65,  jaName: 'メガフーディン' },
+  { baseId: 80,  jaName: 'メガヤドラン' },
+  { baseId: 94,  jaName: 'メガゲンガー' },
+  { baseId: 115, jaName: 'メガガルーラ' },
+  { baseId: 127, jaName: 'メガカイロス' },
+  { baseId: 130, jaName: 'メガギャラドス' },
+  { baseId: 142, jaName: 'メガプテラ' },
+  { baseId: 150, jaName: 'メガミュウツーX' },
+  { baseId: 150, jaName: 'メガミュウツーY' },
+  { baseId: 181, jaName: 'メガデンリュウ' },
+  { baseId: 208, jaName: 'メガハガネール' },
+  { baseId: 212, jaName: 'メガハッサム' },
+  { baseId: 214, jaName: 'メガヘラクロス' },
+  { baseId: 229, jaName: 'メガヘルガー' },
+  { baseId: 248, jaName: 'メガバンギラス' },
+  { baseId: 254, jaName: 'メガジュカイン' },
+  { baseId: 257, jaName: 'メガバシャーモ' },
+  { baseId: 260, jaName: 'メガラグラージ' },
+  { baseId: 282, jaName: 'メガサーナイト' },
+  { baseId: 302, jaName: 'メガヤミラミ' },
+  { baseId: 303, jaName: 'メガクチート' },
+  { baseId: 306, jaName: 'メガボスゴドラ' },
+  { baseId: 308, jaName: 'メガチャーレム' },
+  { baseId: 310, jaName: 'メガライボルト' },
+  { baseId: 319, jaName: 'メガサメハダー' },
+  { baseId: 323, jaName: 'メガバクーダ' },
+  { baseId: 334, jaName: 'メガチルタリス' },
+  { baseId: 354, jaName: 'メガジュペッタ' },
+  { baseId: 359, jaName: 'メガアブソル' },
+  { baseId: 362, jaName: 'メガオニゴーリ' },
+  { baseId: 373, jaName: 'メガボーマンダ' },
+  { baseId: 376, jaName: 'メガメタグロス' },
+  { baseId: 380, jaName: 'メガラティアス' },
+  { baseId: 381, jaName: 'メガラティオス' },
+  { baseId: 384, jaName: 'メガレックウザ' },
+  { baseId: 428, jaName: 'メガミミロップ' },
+  { baseId: 445, jaName: 'メガガブリアス' },
+  { baseId: 448, jaName: 'メガルカリオ' },
+  { baseId: 460, jaName: 'メガユキノオー' },
+  { baseId: 475, jaName: 'メガエルレイド' },
+  { baseId: 531, jaName: 'メガタブンネ' },
+  { baseId: 719, jaName: 'メガディアンシー' },
+].map((m, i) => ({
+  id: m.baseId,
+  name: `mega-${i}`,
+  jaName: m.jaName,
+  isMega: true,
+  megaKey: `${m.baseId}-${m.jaName}`,
+}));
 
 function visiblePages(current, total) {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -49,60 +110,58 @@ export default function SearchClient({ list }) {
   const [query, setQuery] = useState('');
   const [region, setRegion] = useState('all');
   const [game, setGame] = useState('all');
+  const [showMega, setShowMega] = useState(false);
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const regionFilter = REGIONS.find((r) => r.value === region);
-    const gameFilter = GAMES.find((g) => g.value === game);
+    const gameFilter   = GAMES.find((g) => g.value === game);
 
-    return list.filter((p) => {
-      if (q && !(p.jaName.includes(q) || p.name.includes(q) || String(p.id).includes(q))) {
-        return false;
-      }
-      if (regionFilter && regionFilter.value !== 'all') {
-        if (p.id < regionFilter.min || p.id > regionFilter.max) return false;
-      }
-      if (gameFilter && gameFilter.value !== 'all') {
-        if (p.id < gameFilter.min || p.id > gameFilter.max) return false;
-      }
+    const inRange = (id) => {
+      if (regionFilter?.value !== 'all' && (id < regionFilter.min || id > regionFilter.max)) return false;
+      if (gameFilter?.value   !== 'all' && (id < gameFilter.min   || id > gameFilter.max))   return false;
       return true;
+    };
+
+    const base = list.filter((p) => {
+      if (q && !(p.jaName.includes(q) || p.name.includes(q) || String(p.id).includes(q))) return false;
+      return inRange(p.id);
     });
-  }, [query, region, game, list]);
+
+    if (!showMega) return base;
+
+    const megas = MEGA_LIST.filter((p) => {
+      if (q && !(p.jaName.includes(q) || String(p.id).includes(q))) return false;
+      return inRange(p.id);
+    });
+
+    return [...base, ...megas].sort((a, b) => {
+      if (a.id !== b.id) return a.id - b.id;
+      if (!a.isMega && b.isMega) return -1;
+      if (a.isMega && !b.isMega) return 1;
+      return a.jaName.localeCompare(b.jaName, 'ja');
+    });
+  }, [query, region, game, showMega, list]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleSearch = (e) => {
-    setQuery(e.target.value);
-    setPage(1);
-  };
-
-  const handleRegion = (v) => {
-    setRegion(v);
-    setPage(1);
-  };
-
-  const handleGame = (v) => {
-    setGame(v);
-    setPage(1);
-  };
+  const reset = () => setPage(1);
 
   const pages = visiblePages(page, totalPages);
 
   return (
     <div>
+      {/* 検索フィールド */}
       <div className="px-4 pb-3">
         <div className="relative">
-          <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-          />
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           <input
             type="search"
             placeholder="名前またはNoで検索…"
             value={query}
-            onChange={handleSearch}
+            onChange={(e) => { setQuery(e.target.value); reset(); }}
             className="w-full rounded-2xl pl-11 pr-4 py-3 text-sm font-medium text-gray-700 placeholder:text-gray-400
                        bg-white/55 backdrop-blur-xl border border-white/70
                        shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)]
@@ -111,31 +170,68 @@ export default function SearchClient({ list }) {
         </div>
       </div>
 
-      <div className="px-4 pb-4 flex gap-3">
-        <GlassSelect value={region} onChange={handleRegion} options={REGIONS} label="地方" />
-        <GlassSelect value={game} onChange={handleGame} options={GAMES} label="ゲーム" />
+      {/* プルダウン */}
+      <div className="px-4 pb-3 flex gap-3">
+        <GlassSelect value={region} onChange={(v) => { setRegion(v); reset(); }} options={REGIONS} label="地方" />
+        <GlassSelect value={game}   onChange={(v) => { setGame(v);   reset(); }} options={GAMES}   label="ゲーム" />
       </div>
 
+      {/* メガシンカ チェックボックス */}
+      <div className="px-4 pb-4">
+        <button
+          type="button"
+          onClick={() => { setShowMega((v) => !v); reset(); }}
+          className={`flex items-center gap-2.5 rounded-2xl px-4 py-2.5 text-sm font-semibold select-none
+                      transition-all active:scale-95
+                      ${showMega
+                        ? 'bg-amber-400/80 backdrop-blur-xl border border-amber-300/70 text-amber-900 shadow-[0_4px_16px_rgba(251,191,36,0.35),inset_0_1px_0_rgba(255,255,255,0.7)]'
+                        : 'bg-white/55 backdrop-blur-xl border border-white/70 text-gray-600 shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)]'
+                      }`}
+        >
+          <span className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors shrink-0 ${
+            showMega ? 'bg-amber-600/80 border border-amber-500' : 'border-2 border-gray-300 bg-white/40'
+          }`}>
+            {showMega && <Check size={13} strokeWidth={3} className="text-white" />}
+          </span>
+          <Sparkles size={15} className={showMega ? 'text-amber-700' : 'text-gray-400'} />
+          メガシンカを表示
+        </button>
+      </div>
+
+      {/* グリッド */}
       <div className="px-4 grid grid-cols-3 gap-3">
-        {paginated.map((p) => (
-          <Link key={p.id} href={`/pokemon/${p.id}`}>
-            <div className="rounded-2xl p-2 text-center bg-white/55 backdrop-blur-xl border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.8)] active:scale-95 transition-transform duration-100">
-              <div className="relative w-full aspect-square">
-                <Image
-                  src={officialArtwork(p.id)}
-                  alt={p.jaName}
-                  fill
-                  className="object-contain drop-shadow"
-                  unoptimized
-                />
+        {paginated.map((p) => {
+          const displayNo = `No.${String(p.id).padStart(4, '0')}${p.isMega ? 'x' : ''}`;
+          return (
+            <Link key={p.isMega ? p.megaKey : p.id} href={`/pokemon/${p.id}`}>
+              <div className={`rounded-2xl p-2 text-center backdrop-blur-xl border active:scale-95 transition-transform duration-100
+                ${p.isMega
+                  ? 'bg-amber-50/70 border-amber-200/70 shadow-[0_4px_16px_rgba(251,191,36,0.20),inset_0_1px_0_rgba(255,255,255,0.9)]'
+                  : 'bg-white/55 border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.8)]'
+                }`}
+              >
+                <div className="relative w-full aspect-square">
+                  <Image
+                    src={officialArtwork(p.id)}
+                    alt={p.jaName}
+                    fill
+                    className="object-contain drop-shadow"
+                    unoptimized
+                  />
+                  {p.isMega && (
+                    <span className="absolute top-0.5 right-0.5 text-[8px] font-black bg-amber-400 text-white px-1 py-0.5 rounded-full leading-none">
+                      MEGA
+                    </span>
+                  )}
+                </div>
+                <p className={`text-[10px] font-mono mt-1 ${p.isMega ? 'text-amber-600' : 'text-gray-400'}`}>
+                  {displayNo}
+                </p>
+                <p className="text-xs font-bold text-gray-700 truncate">{p.jaName}</p>
               </div>
-              <p className="text-[10px] text-gray-400 font-mono mt-1">
-                No.{String(p.id).padStart(4, '0')}
-              </p>
-              <p className="text-xs font-bold text-gray-700 truncate">{p.jaName}</p>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (
