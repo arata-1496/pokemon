@@ -2,7 +2,9 @@
 import { useState, useMemo, Fragment } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 import { officialArtwork } from '@/lib/pokeapi';
+import GlassSelect from '@/components/GlassSelect';
 
 const PAGE_SIZE = 60;
 
@@ -76,13 +78,13 @@ export default function SearchClient({ list }) {
     setPage(1);
   };
 
-  const handleRegion = (e) => {
-    setRegion(e.target.value);
+  const handleRegion = (v) => {
+    setRegion(v);
     setPage(1);
   };
 
-  const handleGame = (e) => {
-    setGame(e.target.value);
+  const handleGame = (v) => {
+    setGame(v);
     setPage(1);
   };
 
@@ -91,40 +93,33 @@ export default function SearchClient({ list }) {
   return (
     <div>
       <div className="px-4 pb-3">
-        <input
-          type="search"
-          placeholder="名前またはNoで検索…"
-          value={query}
-          onChange={handleSearch}
-          className="w-full bg-white rounded-2xl px-4 py-3 text-sm shadow outline-none"
-        />
+        <div className="relative">
+          <Search
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          />
+          <input
+            type="search"
+            placeholder="名前またはNoで検索…"
+            value={query}
+            onChange={handleSearch}
+            className="w-full rounded-2xl pl-11 pr-4 py-3 text-sm font-medium text-gray-700 placeholder:text-gray-400
+                       bg-white/55 backdrop-blur-xl border border-white/70
+                       shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)]
+                       outline-none focus:bg-white/75 transition-colors"
+          />
+        </div>
       </div>
 
       <div className="px-4 pb-4 flex gap-3">
-        <select
-          value={region}
-          onChange={handleRegion}
-          className="bg-white rounded-xl px-3 py-2 text-sm shadow text-gray-700 w-full outline-none"
-        >
-          {REGIONS.map((r) => (
-            <option key={r.value} value={r.value}>{r.label}</option>
-          ))}
-        </select>
-        <select
-          value={game}
-          onChange={handleGame}
-          className="bg-white rounded-xl px-3 py-2 text-sm shadow text-gray-700 w-full outline-none"
-        >
-          {GAMES.map((g) => (
-            <option key={g.value} value={g.value}>{g.label}</option>
-          ))}
-        </select>
+        <GlassSelect value={region} onChange={handleRegion} options={REGIONS} label="地方" />
+        <GlassSelect value={game} onChange={handleGame} options={GAMES} label="ゲーム" />
       </div>
 
       <div className="px-4 grid grid-cols-3 gap-3">
         {paginated.map((p) => (
           <Link key={p.id} href={`/pokemon/${p.id}`}>
-            <div className="bg-white rounded-2xl p-2 text-center shadow active:scale-95 transition-transform duration-100">
+            <div className="rounded-2xl p-2 text-center bg-white/55 backdrop-blur-xl border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.8)] active:scale-95 transition-transform duration-100">
               <div className="relative w-full aspect-square">
                 <Image
                   src={officialArtwork(p.id)}
@@ -152,7 +147,7 @@ export default function SearchClient({ list }) {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="w-9 h-9 bg-white rounded-xl shadow text-sm font-bold text-gray-600 disabled:opacity-40"
+            className="w-9 h-9 rounded-full bg-white/55 backdrop-blur-xl border border-white/70 shadow-[0_2px_10px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)] text-sm font-bold text-gray-600 disabled:opacity-40 active:scale-90 transition-transform"
           >
             ←
           </button>
@@ -160,14 +155,14 @@ export default function SearchClient({ list }) {
           {pages.map((n, i) => (
             <Fragment key={n}>
               {i > 0 && pages[i - 1] !== n - 1 && (
-                <span className="text-white/70 text-sm w-5 text-center">…</span>
+                <span className="text-white/80 text-sm w-5 text-center">…</span>
               )}
               <button
                 onClick={() => setPage(n)}
-                className={`w-9 h-9 rounded-xl shadow text-sm font-bold transition-colors ${
+                className={`w-9 h-9 rounded-full text-sm font-bold transition-all active:scale-90 ${
                   page === n
-                    ? 'bg-red-500 text-white'
-                    : 'bg-white text-gray-600'
+                    ? 'bg-red-500 text-white shadow-[0_4px_14px_rgba(239,68,68,0.45)]'
+                    : 'bg-white/55 backdrop-blur-xl border border-white/70 text-gray-600 shadow-[0_2px_10px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)]'
                 }`}
               >
                 {n}
@@ -178,7 +173,7 @@ export default function SearchClient({ list }) {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="w-9 h-9 bg-white rounded-xl shadow text-sm font-bold text-gray-600 disabled:opacity-40"
+            className="w-9 h-9 rounded-full bg-white/55 backdrop-blur-xl border border-white/70 shadow-[0_2px_10px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)] text-sm font-bold text-gray-600 disabled:opacity-40 active:scale-90 transition-transform"
           >
             →
           </button>

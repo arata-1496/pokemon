@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { getChartForEra, ERA_OPTIONS, TYPE_SHORT_JA } from '@/lib/typedata';
+import GlassSelect from '@/components/GlassSelect';
 
 function cellStyle(v) {
   if (v === 2)   return 'bg-green-400 text-white';
@@ -22,16 +23,10 @@ export default function TypeChart({ typeNamesJa }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex justify-center">
-        <select
-          value={era}
-          onChange={(e) => setEra(e.target.value)}
-          className="bg-white rounded-xl px-3 py-2 text-sm shadow text-gray-700 outline-none"
-        >
-          {ERA_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+      <div className="flex justify-center px-4">
+        <div className="w-64 max-w-full">
+          <GlassSelect value={era} onChange={setEra} options={ERA_OPTIONS} label="世代" />
+        </div>
       </div>
 
       <div className="bg-white/90 rounded-2xl shadow p-2 overflow-x-auto">

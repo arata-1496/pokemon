@@ -23,8 +23,10 @@ export default function TabBar() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-[0_-1px_12px_rgba(0,0,0,0.08)] flex z-50"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed left-1/2 -translate-x-1/2 bottom-3 z-50 flex items-stretch gap-1 px-2 py-2
+                 rounded-[2rem] bg-white/45 backdrop-blur-2xl border border-white/60
+                 shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.9)]"
+      style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
     >
       {TABS.map(({ href, label, Icon }) => {
         const active = isActive(href);
@@ -32,22 +34,20 @@ export default function TabBar() {
           <Link
             key={href}
             href={href}
-            className="flex-1 flex flex-col items-center pt-2 pb-1 gap-0.5 transition-colors"
+            className={`flex flex-col items-center justify-center gap-0.5 rounded-3xl px-4 py-2 transition-all duration-200 active:scale-90 ${
+              active
+                ? 'bg-red-500 shadow-[0_4px_14px_rgba(239,68,68,0.45)]'
+                : ''
+            }`}
           >
+            <Icon
+              size={22}
+              strokeWidth={active ? 2.5 : 1.9}
+              className={`transition-colors ${active ? 'text-white' : 'text-gray-500'}`}
+            />
             <span
-              className={`flex items-center justify-center w-12 h-7 rounded-full transition-colors ${
-                active ? 'bg-red-50' : ''
-              }`}
-            >
-              <Icon
-                size={22}
-                strokeWidth={active ? 2.5 : 1.8}
-                className={`transition-colors ${active ? 'text-red-500' : 'text-gray-400'}`}
-              />
-            </span>
-            <span
-              className={`text-[11px] font-semibold tracking-wide transition-colors ${
-                active ? 'text-red-500' : 'text-gray-400'
+              className={`text-[10px] font-bold tracking-wide transition-colors ${
+                active ? 'text-white' : 'text-gray-500'
               }`}
             >
               {label}
