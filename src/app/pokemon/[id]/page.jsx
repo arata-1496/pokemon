@@ -274,7 +274,7 @@ async function EvoSection({ chainUrl, currentId }) {
 
   return (
     <Section title="進化">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto py-1 px-1">
         <EvoChain node={evoTree} currentId={currentId} itemNameMap={itemNameMap} moveNameMap={moveNameMap} />
       </div>
     </Section>
