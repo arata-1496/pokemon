@@ -351,8 +351,8 @@ function EvoChain({ node, currentId, itemNameMap, moveNameMap }) {
       )}
       <Link href={`/pokemon/${node.id}`}>
         <div className={`flex flex-col items-center px-3 py-2 rounded-2xl transition-colors ${isCurrent ? 'bg-red-50 ring-2 ring-red-300' : 'hover:bg-gray-50'}`}>
-          <div className="relative w-16 h-16">
-            <Image src={officialArtwork(node.id)} alt={node.jaName || node.name} fill className="object-contain drop-shadow" unoptimized />
+          <div className="w-16 h-16 flex items-center justify-center overflow-visible">
+            <Image src={officialArtwork(node.id)} alt={node.jaName || node.name} width={64} height={64} className="drop-shadow object-contain" unoptimized />
           </div>
           <p className="text-xs font-bold text-gray-700 mt-1">{node.jaName || node.name}</p>
         </div>

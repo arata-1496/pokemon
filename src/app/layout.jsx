@@ -5,6 +5,7 @@ import TabBar from '@/components/TabBar';
 export const metadata = {
   title: 'ポケモン誕生日診断',
   description: '生年月日からあなたのポケモンを診断！',
+  robots: { index: false, follow: false },
   appleWebApp: {
     capable: true,
     title: 'ポケモン診断',
