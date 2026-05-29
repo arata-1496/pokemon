@@ -10,6 +10,7 @@ import {
 } from '@/lib/pokeapi';
 import TypeBadge from '@/components/TypeBadge';
 import BackButton from '@/components/BackButton';
+import PokemonImage from '@/components/PokemonImage';
 import { getMegasForBase, getFormInfo } from '@/lib/forms';
 
 export async function generateMetadata({ params }) {
@@ -88,15 +89,8 @@ export default async function PokemonDetailPage({ params }) {
               </span>
             </div>
           )}
-          <div className="relative mx-auto my-2" style={{ width: '100%', maxWidth: 220, aspectRatio: '1' }}>
-            <Image
-              src={officialArtwork(numId)}
-              alt={jaName}
-              fill
-              priority
-              className="object-contain drop-shadow-xl"
-              unoptimized
-            />
+          <div className="my-2">
+            <PokemonImage id={numId} alt={jaName} />
           </div>
           <h1 className="text-3xl font-black text-gray-800 mb-2">{jaName}</h1>
           <div className="flex justify-center gap-2">

@@ -64,6 +64,10 @@ export function officialArtwork(id) {
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
 }
 
+export function shinyArtwork(id) {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${id}.png`;
+}
+
 export function calcTypeMatchup(typeDataList) {
   const mult = {};
   for (const td of typeDataList) {
