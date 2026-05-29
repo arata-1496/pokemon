@@ -1,8 +1,7 @@
-// Mega Evolution data shared between the search page and the detail page's
-// evolution chain. Each entry maps a base Pokémon (baseId) to its Mega form's
-// official-artwork sprite id and Japanese name.
-//
-// List: Gen 6 originals + Pokémon Legends Z-A new megas.
+// Mega Evolution + alternate-form data shared between the search page and the
+// detail page. Each entry maps a base Pokémon (baseId) to a form's
+// official-artwork sprite id and Japanese name. The sprite id doubles as the
+// PokeAPI `pokemon` id for that form, so the detail page can fetch it directly.
 
 export const MEGA_RAW = [
   // ── Gen 6 megas ──
@@ -99,7 +98,196 @@ export const MEGA_RAW = [
   { baseId: 998, spriteId: 10325, jaName: 'メガバリコオル' },
 ];
 
-// baseId → [{ spriteId, jaName }, ...]
+export const ALT_FORM_RAW = [
+  { baseId: 3,   spriteId: 10195, jaName: 'キョダイフシギバナ' },
+  { baseId: 6,   spriteId: 10196, jaName: 'キョダイリザードン' },
+  { baseId: 9,   spriteId: 10197, jaName: 'キョダイカメックス' },
+  { baseId: 12,  spriteId: 10198, jaName: 'キョダイバタフリー' },
+  { baseId: 19,  spriteId: 10091, jaName: 'アローラコラッタ' },
+  { baseId: 20,  spriteId: 10092, jaName: 'アローララッタ' },
+  { baseId: 25,  spriteId: 10199, jaName: 'キョダイピカチュウ' },
+  { baseId: 26,  spriteId: 10100, jaName: 'アローラライチュウ' },
+  { baseId: 27,  spriteId: 10101, jaName: 'アローラサンド' },
+  { baseId: 28,  spriteId: 10102, jaName: 'アローラサンドパン' },
+  { baseId: 37,  spriteId: 10103, jaName: 'アローラロコン' },
+  { baseId: 38,  spriteId: 10104, jaName: 'アローラキュウコン' },
+  { baseId: 50,  spriteId: 10105, jaName: 'アローラディグダ' },
+  { baseId: 51,  spriteId: 10106, jaName: 'アローラダグトリオ' },
+  { baseId: 52,  spriteId: 10107, jaName: 'アローラニャース' },
+  { baseId: 52,  spriteId: 10161, jaName: 'ガラルニャース' },
+  { baseId: 52,  spriteId: 10200, jaName: 'キョダイニャース' },
+  { baseId: 53,  spriteId: 10108, jaName: 'アローラペルシアン' },
+  { baseId: 58,  spriteId: 10229, jaName: 'ヒスイガーディ' },
+  { baseId: 59,  spriteId: 10230, jaName: 'ヒスイウインディ' },
+  { baseId: 68,  spriteId: 10201, jaName: 'キョダイカイリキー' },
+  { baseId: 74,  spriteId: 10109, jaName: 'アローライシツブテ' },
+  { baseId: 75,  spriteId: 10110, jaName: 'アローラゴローン' },
+  { baseId: 76,  spriteId: 10111, jaName: 'アローラゴローニャ' },
+  { baseId: 77,  spriteId: 10162, jaName: 'ガラルポニータ' },
+  { baseId: 78,  spriteId: 10163, jaName: 'ガラルギャロップ' },
+  { baseId: 79,  spriteId: 10164, jaName: 'ガラルヤドン' },
+  { baseId: 80,  spriteId: 10165, jaName: 'ガラルヤドラン' },
+  { baseId: 83,  spriteId: 10166, jaName: 'ガラルカモネギ' },
+  { baseId: 88,  spriteId: 10112, jaName: 'アローラベトベター' },
+  { baseId: 89,  spriteId: 10113, jaName: 'アローラベトベトン' },
+  { baseId: 94,  spriteId: 10202, jaName: 'キョダイゲンガー' },
+  { baseId: 99,  spriteId: 10203, jaName: 'キョダイキングラー' },
+  { baseId: 100, spriteId: 10231, jaName: 'ヒスイビリリダマ' },
+  { baseId: 101, spriteId: 10232, jaName: 'ヒスイマルマイン' },
+  { baseId: 103, spriteId: 10114, jaName: 'アローラナッシー' },
+  { baseId: 105, spriteId: 10115, jaName: 'アローラガラガラ' },
+  { baseId: 110, spriteId: 10167, jaName: 'ガラルマタドガス' },
+  { baseId: 122, spriteId: 10168, jaName: 'ガラルバリヤード' },
+  { baseId: 128, spriteId: 10250, jaName: 'パルデアケンタロス（くれないのいかり）' },
+  { baseId: 128, spriteId: 10251, jaName: 'パルデアケンタロス（もえるいかり）' },
+  { baseId: 128, spriteId: 10252, jaName: 'パルデアケンタロス（うねりのいかり）' },
+  { baseId: 131, spriteId: 10204, jaName: 'キョダイラプラス' },
+  { baseId: 133, spriteId: 10205, jaName: 'キョダイイーブイ' },
+  { baseId: 143, spriteId: 10206, jaName: 'キョダイカビゴン' },
+  { baseId: 144, spriteId: 10169, jaName: 'ガラルフリーザー' },
+  { baseId: 145, spriteId: 10170, jaName: 'ガラルサンダー' },
+  { baseId: 146, spriteId: 10171, jaName: 'ガラルファイヤー' },
+  { baseId: 157, spriteId: 10233, jaName: 'ヒスイバクフーン' },
+  { baseId: 194, spriteId: 10253, jaName: 'パルデアウパー' },
+  { baseId: 199, spriteId: 10172, jaName: 'ガラルヤドキング' },
+  { baseId: 211, spriteId: 10234, jaName: 'ヒスイハリーセン' },
+  { baseId: 215, spriteId: 10235, jaName: 'ヒスイニューラ' },
+  { baseId: 222, spriteId: 10173, jaName: 'ガラルサニーゴ' },
+  { baseId: 263, spriteId: 10174, jaName: 'ガラルジグザグマ' },
+  { baseId: 264, spriteId: 10175, jaName: 'ガラルマッスグマ' },
+  { baseId: 351, spriteId: 10013, jaName: 'ポワルン（にほんばれ）' },
+  { baseId: 351, spriteId: 10014, jaName: 'ポワルン（あめ）' },
+  { baseId: 351, spriteId: 10015, jaName: 'ポワルン（あられ）' },
+  { baseId: 382, spriteId: 10077, jaName: 'ゲンシカイオーガ' },
+  { baseId: 383, spriteId: 10078, jaName: 'ゲンシグラードン' },
+  { baseId: 386, spriteId: 10001, jaName: 'デオキシス（アタックフォルム）' },
+  { baseId: 386, spriteId: 10002, jaName: 'デオキシス（ディフェンスフォルム）' },
+  { baseId: 386, spriteId: 10003, jaName: 'デオキシス（スピードフォルム）' },
+  { baseId: 413, spriteId: 10004, jaName: 'ミノマダム（すなちのすがた）' },
+  { baseId: 413, spriteId: 10005, jaName: 'ミノマダム（くずもののすがた）' },
+  { baseId: 479, spriteId: 10008, jaName: 'ヒートロトム' },
+  { baseId: 479, spriteId: 10009, jaName: 'ウォッシュロトム' },
+  { baseId: 479, spriteId: 10010, jaName: 'フロストロトム' },
+  { baseId: 479, spriteId: 10011, jaName: 'スピンロトム' },
+  { baseId: 479, spriteId: 10012, jaName: 'カットロトム' },
+  { baseId: 483, spriteId: 10245, jaName: 'ディアルガ（オリジンフォルム）' },
+  { baseId: 484, spriteId: 10246, jaName: 'パルキア（オリジンフォルム）' },
+  { baseId: 487, spriteId: 10007, jaName: 'ギラティナ（オリジンフォルム）' },
+  { baseId: 492, spriteId: 10006, jaName: 'シェイミ（スカイフォルム）' },
+  { baseId: 503, spriteId: 10236, jaName: 'ヒスイダイケンキ' },
+  { baseId: 549, spriteId: 10237, jaName: 'ヒスイドレディア' },
+  { baseId: 550, spriteId: 10016, jaName: 'バスラオ（あおすじ）' },
+  { baseId: 550, spriteId: 10247, jaName: 'バスラオ（しろすじ）' },
+  { baseId: 554, spriteId: 10176, jaName: 'ガラルダルマッカ' },
+  { baseId: 555, spriteId: 10017, jaName: 'ヒヒダルマ（ダルマモード）' },
+  { baseId: 555, spriteId: 10177, jaName: 'ガラルヒヒダルマ' },
+  { baseId: 555, spriteId: 10178, jaName: 'ガラルヒヒダルマ（ダルマモード）' },
+  { baseId: 562, spriteId: 10179, jaName: 'ガラルデスマス' },
+  { baseId: 569, spriteId: 10207, jaName: 'キョダイダストダス' },
+  { baseId: 570, spriteId: 10238, jaName: 'ヒスイゾロア' },
+  { baseId: 571, spriteId: 10239, jaName: 'ヒスイゾロアーク' },
+  { baseId: 618, spriteId: 10180, jaName: 'ガラルマッギョ' },
+  { baseId: 628, spriteId: 10240, jaName: 'ヒスイウォーグル' },
+  { baseId: 641, spriteId: 10019, jaName: 'トルネロス（れいじゅうフォルム）' },
+  { baseId: 642, spriteId: 10020, jaName: 'ボルトロス（れいじゅうフォルム）' },
+  { baseId: 645, spriteId: 10021, jaName: 'ランドロス（れいじゅうフォルム）' },
+  { baseId: 646, spriteId: 10022, jaName: 'ブラックキュレム' },
+  { baseId: 646, spriteId: 10023, jaName: 'ホワイトキュレム' },
+  { baseId: 647, spriteId: 10024, jaName: 'ケルディオ（かくごのすがた）' },
+  { baseId: 648, spriteId: 10018, jaName: 'メロエッタ（ステップフォルム）' },
+  { baseId: 658, spriteId: 10116, jaName: 'きずなへんげゲッコウガ' },
+  { baseId: 658, spriteId: 10117, jaName: 'サトシゲッコウガ' },
+  { baseId: 670, spriteId: 10061, jaName: 'フラエッテ（えいえんのはな）' },
+  { baseId: 678, spriteId: 10025, jaName: 'ニャオニクス（メス）' },
+  { baseId: 681, spriteId: 10026, jaName: 'ギルガルド（ブレードフォルム）' },
+  { baseId: 705, spriteId: 10241, jaName: 'ヒスイヌメイル' },
+  { baseId: 706, spriteId: 10242, jaName: 'ヒスイヌメルゴン' },
+  { baseId: 710, spriteId: 10027, jaName: 'バケッチャ（ちいさいサイズ）' },
+  { baseId: 710, spriteId: 10028, jaName: 'バケッチャ（おおきいサイズ）' },
+  { baseId: 710, spriteId: 10029, jaName: 'バケッチャ（とくだいサイズ）' },
+  { baseId: 711, spriteId: 10030, jaName: 'パンプジン（ちいさいサイズ）' },
+  { baseId: 711, spriteId: 10031, jaName: 'パンプジン（おおきいサイズ）' },
+  { baseId: 711, spriteId: 10032, jaName: 'パンプジン（とくだいサイズ）' },
+  { baseId: 713, spriteId: 10243, jaName: 'ヒスイクレベース' },
+  { baseId: 718, spriteId: 10118, jaName: 'ジガルデ（10%フォルム）' },
+  { baseId: 718, spriteId: 10119, jaName: 'ジガルデ（50%フォルム）' },
+  { baseId: 718, spriteId: 10120, jaName: 'ジガルデ（パーフェクトフォルム）' },
+  { baseId: 720, spriteId: 10086, jaName: 'フーパ（ときはなたれしフォルム）' },
+  { baseId: 724, spriteId: 10244, jaName: 'ヒスイジュナイパー' },
+  { baseId: 745, spriteId: 10126, jaName: 'ルガルガン（まよなかのすがた）' },
+  { baseId: 745, spriteId: 10152, jaName: 'ルガルガン（たそがれのすがた）' },
+  { baseId: 746, spriteId: 10127, jaName: 'ヨワシ（むれたすがた）' },
+  { baseId: 774, spriteId: 10136, jaName: 'メテノ（コアのすがた）' },
+  { baseId: 800, spriteId: 10155, jaName: 'ネクロズマ（たそがれのすがた）' },
+  { baseId: 800, spriteId: 10156, jaName: 'ネクロズマ（あかつきのつばさ）' },
+  { baseId: 800, spriteId: 10157, jaName: 'ウルトラネクロズマ' },
+  { baseId: 801, spriteId: 10147, jaName: 'マギアナ（オリジナルカラー）' },
+  { baseId: 809, spriteId: 10208, jaName: 'キョダイメルメタル' },
+  { baseId: 812, spriteId: 10209, jaName: 'キョダイゴリランダー' },
+  { baseId: 815, spriteId: 10210, jaName: 'キョダイエースバーン' },
+  { baseId: 818, spriteId: 10211, jaName: 'キョダイインテレオン' },
+  { baseId: 823, spriteId: 10212, jaName: 'キョダイアーマーガア' },
+  { baseId: 826, spriteId: 10213, jaName: 'キョダイイオルブ' },
+  { baseId: 834, spriteId: 10214, jaName: 'キョダイカジリガメ' },
+  { baseId: 839, spriteId: 10215, jaName: 'キョダイセキタンザン' },
+  { baseId: 841, spriteId: 10216, jaName: 'キョダイアップリュー' },
+  { baseId: 842, spriteId: 10217, jaName: 'キョダイタルップル' },
+  { baseId: 844, spriteId: 10218, jaName: 'キョダイサダイジャ' },
+  { baseId: 845, spriteId: 10182, jaName: 'ウッウ（ほおばったすがた）' },
+  { baseId: 845, spriteId: 10183, jaName: 'ウッウ（おおぐいのすがた）' },
+  { baseId: 849, spriteId: 10184, jaName: 'ストリンダー（ローキーフォルム）' },
+  { baseId: 851, spriteId: 10220, jaName: 'キョダイマルヤクデ' },
+  { baseId: 858, spriteId: 10221, jaName: 'キョダイブリムオン' },
+  { baseId: 861, spriteId: 10222, jaName: 'キョダイオーロンゲ' },
+  { baseId: 869, spriteId: 10223, jaName: 'キョダイマホイップ' },
+  { baseId: 875, spriteId: 10185, jaName: 'コオリッポ（もぐったすがた）' },
+  { baseId: 876, spriteId: 10186, jaName: 'イエッサン（メス）' },
+  { baseId: 877, spriteId: 10187, jaName: 'モルペコ（はらぺこのすがた）' },
+  { baseId: 879, spriteId: 10224, jaName: 'キョダイダイオウドウ' },
+  { baseId: 884, spriteId: 10225, jaName: 'キョダイジュラルドン' },
+  { baseId: 888, spriteId: 10188, jaName: 'ザシアン（けんのおう）' },
+  { baseId: 889, spriteId: 10189, jaName: 'ザマゼンタ（けんのおう）' },
+  { baseId: 890, spriteId: 10190, jaName: 'エタムゲンダイナ' },
+  { baseId: 892, spriteId: 10191, jaName: 'ウーラオス（れんげきのかた）' },
+  { baseId: 893, spriteId: 10192, jaName: 'ザルード（ダダリン）' },
+  { baseId: 898, spriteId: 10193, jaName: 'バドレックス（はくばのすがた）' },
+  { baseId: 898, spriteId: 10194, jaName: 'バドレックス（こくばのすがた）' },
+  { baseId: 901, spriteId: 10272, jaName: 'ガチグマ（ブラッドムーン）' },
+  { baseId: 902, spriteId: 10248, jaName: 'イダイトウ（メス）' },
+  { baseId: 905, spriteId: 10249, jaName: 'ラブトロス（れいじゅうフォルム）' },
+  { baseId: 916, spriteId: 10254, jaName: 'パフュートン（メス）' },
+  { baseId: 964, spriteId: 10256, jaName: 'イルカマン（ヒーローのすがた）' },
+  { baseId: 978, spriteId: 10258, jaName: 'シャリタツ（うなだれたすがた）' },
+  { baseId: 978, spriteId: 10259, jaName: 'シャリタツ（のびのびすがた）' },
+  { baseId: 982, spriteId: 10255, jaName: 'ノココッチ（さんぶんぎ）' },
+  { baseId: 999, spriteId: 10263, jaName: 'コレクレー（ほうろうのすがた）' },
+  { baseId: 1017, spriteId: 10273, jaName: 'オーガポン（いどのめん）' },
+  { baseId: 1017, spriteId: 10274, jaName: 'オーガポン（かまどのめん）' },
+  { baseId: 1017, spriteId: 10275, jaName: 'オーガポン（いしずえのめん）' },
+  { baseId: 1024, spriteId: 10276, jaName: 'テラパゴス（テラスタルのすがた）' },
+  { baseId: 1024, spriteId: 10277, jaName: 'テラパゴス（ステラのすがた）' },
+];
+
+// Category for the search filter chips / detail-page badge.
+//   'mega'   → Mega Evolution
+//   'gmax'   → Gigantamax (キョダイマックス)
+//   'region' → Regional form (アローラ/ガラル/ヒスイ/パルデア)
+//   'other'  → Other formes
+export function formCategory(jaName, isMega = false) {
+  if (isMega) return 'mega';
+  if (jaName.startsWith('キョダイ')) return 'gmax';
+  if (
+    jaName.startsWith('アローラ') ||
+    jaName.startsWith('ガラル') ||
+    jaName.startsWith('ヒスイ') ||
+    jaName.startsWith('パルデア')
+  ) {
+    return 'region';
+  }
+  return 'other';
+}
+
+// baseId → [{ spriteId, jaName }, ...]  (megas only — used by the evo chain)
 const megasByBase = (() => {
   const m = new Map();
   for (const x of MEGA_RAW) {
@@ -111,4 +299,20 @@ const megasByBase = (() => {
 
 export function getMegasForBase(id) {
   return megasByBase.get(id) ?? [];
+}
+
+// spriteId → { baseId, jaName, kind: 'mega'|'alt', category }  (null for base ids)
+const formBySprite = (() => {
+  const m = new Map();
+  for (const x of MEGA_RAW) {
+    m.set(x.spriteId, { baseId: x.baseId, jaName: x.jaName, kind: 'mega', category: 'mega' });
+  }
+  for (const x of ALT_FORM_RAW) {
+    m.set(x.spriteId, { baseId: x.baseId, jaName: x.jaName, kind: 'alt', category: formCategory(x.jaName) });
+  }
+  return m;
+})();
+
+export function getFormInfo(spriteId) {
+  return formBySprite.get(spriteId) ?? null;
 }

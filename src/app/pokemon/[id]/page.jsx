@@ -10,14 +10,14 @@ import {
 } from '@/lib/pokeapi';
 import TypeBadge from '@/components/TypeBadge';
 import BackButton from '@/components/BackButton';
-import { getMegasForBase } from '@/lib/forms';
+import { getMegasForBase, getFormInfo } from '@/lib/forms';
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const [pokemon, species] = await Promise.all([
-    fetchPokemon(Number(id)),
-    fetchSpecies(Number(id)),
-  ]);
+  const numId = Number(id);
+  const formInfo = getFormInfo(numId);
+  if (formInfo) return { title: `${formInfo.jaName} - ポケモン図鑑` };
+  const [pokemon, species] = await Promise.all([fetchPokemon(numId), fetchSpecies(numId)]);
   const jaName = getJaName(species?.names ?? []) || pokemon?.name || '';
   return { title: `${jaName} - ポケモン図鑑` };
 }
@@ -25,20 +25,39 @@ export async function generateMetadata({ params }) {
 export default async function PokemonDetailPage({ params }) {
   const { id } = await params;
   const numId = Number(id);
-  if (!numId || numId < 1 || numId > 1025) notFound();
+
+  const formInfo = getFormInfo(numId);
+  const isForm   = !!formInfo;
+  const baseId   = isForm ? formInfo.baseId : numId;
+
+  if (!isForm && (!numId || numId < 1 || numId > 1025)) notFound();
 
   const [pokemon, species] = await Promise.all([
     fetchPokemon(numId),
-    fetchSpecies(numId),
+    fetchSpecies(baseId),
   ]);
   if (!pokemon || !species) notFound();
 
-  const jaName    = getJaName(species.names);
+  const jaName     = isForm ? formInfo.jaName : getJaName(species.names);
   const flavorText = getFlavorText(species.flavor_text_entries);
-  const paddedId  = String(numId).padStart(4, '0');
-  const prevId    = numId > 1 ? numId - 1 : null;
-  const nextId    = numId < 1025 ? numId + 1 : null;
-  const typeNames = pokemon.types.map((t) => t.type.name);
+  const paddedId   = String(baseId).padStart(4, '0');
+  const prevId     = !isForm && baseId > 1    ? baseId - 1 : null;
+  const nextId     = !isForm && baseId < 1025 ? baseId + 1 : null;
+  const typeNames  = pokemon.types.map((t) => t.type.name);
+
+  const formBadgeLabel = isForm
+    ? formInfo.category === 'mega'   ? 'MEGA'
+    : formInfo.category === 'gmax'   ? 'キョダイマックス'
+    : formInfo.category === 'region' ? 'リージョンフォーム'
+    : '別のすがた'
+    : null;
+
+  const formBadgeColor = isForm
+    ? formInfo.category === 'mega'   ? 'bg-amber-400 text-white'
+    : formInfo.category === 'gmax'   ? 'bg-indigo-500 text-white'
+    : formInfo.category === 'region' ? 'bg-teal-500 text-white'
+    : 'bg-violet-500 text-white'
+    : null;
 
   return (
     <main className="flex flex-col bg-pokeballs" style={{ minHeight: '100dvh' }}>
@@ -59,9 +78,16 @@ export default async function PokemonDetailPage({ params }) {
         className="flex-1 px-4 space-y-4"
         style={{ paddingBottom: 'max(5rem, calc(3.5rem + env(safe-area-inset-bottom)))' }}
       >
-        {/* ヘッダーカード：画像・名前・タイプは即座に表示 */}
+        {/* ヘッダーカード */}
         <div className="bg-white rounded-3xl shadow-xl p-5 text-center">
           <p className="text-gray-400 font-mono text-sm">No.{paddedId}</p>
+          {isForm && (
+            <div className="flex justify-center mt-1 mb-0.5">
+              <span className={`text-xs font-black px-3 py-1 rounded-full ${formBadgeColor}`}>
+                {formBadgeLabel}
+              </span>
+            </div>
+          )}
           <div className="relative mx-auto my-2" style={{ width: '100%', maxWidth: 220, aspectRatio: '1' }}>
             <Image
               src={officialArtwork(numId)}
@@ -78,7 +104,15 @@ export default async function PokemonDetailPage({ params }) {
               <TypeBadge key={t.type.name} type={t.type.name} size="md" />
             ))}
           </div>
-          {flavorText && (
+          {isForm && (
+            <Link
+              href={`/pokemon/${baseId}`}
+              className="inline-block mt-3 text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition-colors"
+            >
+              ← ベースフォルムへ
+            </Link>
+          )}
+          {!isForm && flavorText && (
             <p className="text-gray-500 text-sm mt-3 leading-relaxed text-left">{flavorText}</p>
           )}
         </div>
@@ -95,27 +129,31 @@ export default async function PokemonDetailPage({ params }) {
 
         {/* 進化 */}
         <Suspense fallback={<SectionSkeleton height="h-36" />}>
-          <EvoSection chainUrl={species.evolution_chain.url} currentId={numId} />
+          <EvoSection chainUrl={species.evolution_chain.url} currentId={baseId} />
         </Suspense>
 
-        {/* わざ */}
-        <Suspense fallback={<SectionSkeleton height="h-44" />}>
-          <MovesSection moves={pokemon.moves} />
-        </Suspense>
+        {/* わざ（ベースフォルムのみ表示） */}
+        {!isForm && (
+          <Suspense fallback={<SectionSkeleton height="h-44" />}>
+            <MovesSection moves={pokemon.moves} />
+          </Suspense>
+        )}
 
         {/* 前後ナビゲーション */}
-        <div className="flex gap-3 pb-2">
-          {prevId ? (
-            <Link href={`/pokemon/${prevId}`} className="flex-1 bg-white rounded-2xl py-3 text-center text-gray-600 font-bold shadow text-sm">
-              ← No.{String(prevId).padStart(4, '0')}
-            </Link>
-          ) : <div className="flex-1" />}
-          {nextId ? (
-            <Link href={`/pokemon/${nextId}`} className="flex-1 bg-white rounded-2xl py-3 text-center text-gray-600 font-bold shadow text-sm">
-              No.{String(nextId).padStart(4, '0')} →
-            </Link>
-          ) : <div className="flex-1" />}
-        </div>
+        {!isForm && (
+          <div className="flex gap-3 pb-2">
+            {prevId ? (
+              <Link href={`/pokemon/${prevId}`} className="flex-1 bg-white rounded-2xl py-3 text-center text-gray-600 font-bold shadow text-sm">
+                ← No.{String(prevId).padStart(4, '0')}
+              </Link>
+            ) : <div className="flex-1" />}
+            {nextId ? (
+              <Link href={`/pokemon/${nextId}`} className="flex-1 bg-white rounded-2xl py-3 text-center text-gray-600 font-bold shadow text-sm">
+                No.{String(nextId).padStart(4, '0')} →
+              </Link>
+            ) : <div className="flex-1" />}
+          </div>
+        )}
       </div>
     </main>
   );
@@ -245,25 +283,23 @@ async function EvoSection({ chainUrl, currentId }) {
   const evoData = await fetchEvolutionChain(chainUrl);
   if (!evoData) return null;
 
-  const chainIds    = collectChainIds(evoData.chain);
+  const chainIds     = collectChainIds(evoData.chain);
   const chainSpecies = await Promise.all(chainIds.map((cid) => fetchSpecies(cid)));
   const nameMap = Object.fromEntries(
     chainIds.map((cid, i) => [cid, getJaName(chainSpecies[i]?.names ?? [])])
   );
   const evoTree = addNamesToChain(evoData.chain, nameMap);
 
-  // アイテム名：evolution_details の url をそのまま使用して確実に日本語取得
   let itemNameMap = {};
   const evoItemUrls = collectEvoItemUrls(evoData.chain);
   if (evoItemUrls.size > 0) {
-    const entries   = [...evoItemUrls.entries()];
-    const itemData  = await Promise.all(entries.map(([, url]) => fetchMove(url)));
+    const entries  = [...evoItemUrls.entries()];
+    const itemData = await Promise.all(entries.map(([, url]) => fetchMove(url)));
     itemNameMap = Object.fromEntries(
       entries.map(([name], i) => [name, getJaName(itemData[i]?.names ?? []) || name])
     );
   }
 
-  // わざ名
   let moveNameMap = {};
   const evoMoveUrls = collectEvoMoveUrls(evoData.chain);
   if (evoMoveUrls.size > 0) {
@@ -369,7 +405,7 @@ function EvoChain({ node, currentId, itemNameMap, moveNameMap }) {
       {megas.length > 0 && (
         <div className="flex flex-wrap justify-center gap-2 mt-1">
           {megas.map((m) => (
-            <MegaNode key={m.spriteId} baseId={node.id} spriteId={m.spriteId} jaName={m.jaName} />
+            <MegaNode key={m.spriteId} spriteId={m.spriteId} jaName={m.jaName} />
           ))}
         </div>
       )}
@@ -377,15 +413,15 @@ function EvoChain({ node, currentId, itemNameMap, moveNameMap }) {
   );
 }
 
-function MegaNode({ baseId, spriteId, jaName }) {
+function MegaNode({ spriteId, jaName }) {
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center my-1">
         <span className="text-amber-300 text-base">↓</span>
         <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">メガシンカ</span>
       </div>
-      <Link href={`/pokemon/${baseId}`}>
-        <div className="flex flex-col items-center px-3 py-2 rounded-2xl bg-amber-50/60 hover:bg-amber-50 transition-colors">
+      <Link href={`/pokemon/${spriteId}`}>
+        <div className="flex flex-col items-center px-3 py-2 rounded-2xl bg-amber-50/60 hover:bg-amber-100 transition-colors">
           <div className="w-16 h-16 flex items-center justify-center overflow-visible">
             <Image src={officialArtwork(spriteId)} alt={jaName} width={64} height={64} className="drop-shadow object-contain" unoptimized />
           </div>
