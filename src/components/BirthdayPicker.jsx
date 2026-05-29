@@ -90,7 +90,7 @@ export default function BirthdayPicker() {
       {/* ボタン：ホームバー分の余白 */}
       <div
         className="px-5 pt-5"
-        style={{ paddingBottom: 'max(5rem, calc(3.5rem + env(safe-area-inset-bottom)))' }}
+        style={{ paddingBottom: 'max(7.5rem, calc(6rem + env(safe-area-inset-bottom)))' }}
       >
         <button
           onClick={handleStart}
