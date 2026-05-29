@@ -2,11 +2,61 @@
 import { useState, useMemo, Fragment } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, Check, Sparkles } from 'lucide-react';
+import { Search, Check } from 'lucide-react';
 import { officialArtwork } from '@/lib/pokeapi';
 import GlassSelect from '@/components/GlassSelect';
 
 const PAGE_SIZE = 60;
+
+// ─── game dex whitelists (fetched from PokeAPI data mirror) ───────────────────
+
+const LGPE_SET = new Set([
+  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,
+  29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,
+  54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,
+  79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,
+  103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,
+  122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,
+  141,142,143,144,145,146,147,148,149,150,151,808,809,
+]);
+
+const HISUI_SET = new Set([
+  25,26,35,36,37,38,41,42,46,47,54,55,58,59,63,64,65,66,67,68,72,73,74,75,76,
+  77,78,81,82,92,93,94,95,100,101,108,111,112,113,114,122,123,125,126,129,130,
+  133,134,135,136,137,143,155,156,157,169,172,173,175,176,185,190,193,196,197,
+  198,200,201,207,208,211,212,214,215,216,217,220,221,223,224,226,233,234,239,
+  240,242,265,266,267,268,269,280,281,282,299,315,339,340,355,356,358,361,362,
+  363,364,365,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,
+  403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,
+  422,423,424,425,426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,
+  441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,
+  460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,
+  479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,501,502,503,548,
+  549,550,570,571,627,628,641,642,645,700,704,705,706,712,713,722,723,724,899,
+  900,901,902,903,904,905,
+]);
+
+// Base Pokémon IDs that have notable alternate forms (regional variants,
+// different formes, significant gender differences). Excludes Mega Evolutions
+// since those are handled separately.
+const ALT_FORM_IDS = new Set([
+  // Alolan variants
+  19,20,26,27,28,37,38,50,51,52,53,74,75,76,88,89,103,105,
+  // Galarian variants
+  52,77,78,79,80,83,110,122,144,145,146,199,222,263,264,554,555,562,618,
+  // Hisuian variants
+  58,59,100,101,157,211,215,503,549,570,571,628,706,713,724,
+  // Paldean variants
+  128,194,
+  // Multiple formes / significant forms
+  201,351,386,412,413,421,422,423,479,487,492,493,
+  521,550,555,585,586,641,642,645,646,647,648,649,
+  658,668,676,678,681,710,711,716,718,720,
+  741,744,745,746,773,774,778,800,845,849,854,875,877,
+  888,889,890,892,898,902,916,925,952,964,978,982,1012,
+]);
+
+// ─── region & game options ────────────────────────────────────────────────────
 
 const REGIONS = [
   { value: 'all',    label: 'すべて' },
@@ -34,15 +84,15 @@ const GAMES = [
   { value: 'oras', label: 'オメガルビー・アルファサファイア',           min: 252, max: 386  },
   { value: 'sm',   label: 'サン・ムーン',                               min: 722, max: 809  },
   { value: 'usum', label: 'ウルトラサン・ウルトラムーン',               min: 722, max: 809  },
-  { value: 'lgpe', label: "Let's Go! ピカチュウ/イーブイ",             min: 1,   max: 151  },
+  { value: 'lgpe', label: "Let's Go! ピカチュウ/イーブイ",              set: LGPE_SET       },
   { value: 'ss',   label: 'ソード・シールド',                           min: 810, max: 905  },
-  { value: 'bdsp', label: 'ブリリアントダイヤモンド/シャイニングパール', min: 387, max: 493  },
-  { value: 'pla',  label: 'レジェンズ アルセウス',                      min: 1,   max: 905  },
+  { value: 'bdsp', label: 'ブリリアントダイヤモンド/シャイニングパール', min: 1,   max: 493  },
+  { value: 'pla',  label: 'レジェンズ アルセウス',                      set: HISUI_SET      },
   { value: 'sv',   label: 'スカーレット・バイオレット',                 min: 906, max: 1025 },
 ];
 
-// All Mega Evolution Pokémon. `spriteId` is the PokeAPI form id used to load
-// the actual Mega artwork; `baseId` links to the base Pokémon's detail page.
+// ─── Mega Evolution entries ───────────────────────────────────────────────────
+
 const MEGA_LIST = [
   { baseId: 3,   spriteId: 10033, jaName: 'メガフシギバナ' },
   { baseId: 6,   spriteId: 10034, jaName: 'メガリザードンX' },
@@ -101,6 +151,8 @@ const MEGA_LIST = [
   megaKey: `${m.baseId}-${m.spriteId}`,
 }));
 
+// ─── pagination helper ────────────────────────────────────────────────────────
+
 function visiblePages(current, total) {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
   const set = new Set([1, total]);
@@ -108,50 +160,92 @@ function visiblePages(current, total) {
   return [...set].sort((a, b) => a - b);
 }
 
+// ─── FilterChip ──────────────────────────────────────────────────────────────
+
+function FilterChip({ active, onClick, color, children }) {
+  const activeStyle = color === 'amber'
+    ? 'bg-amber-400/80 border-amber-300/70 text-amber-900 shadow-[0_4px_16px_rgba(251,191,36,0.35),inset_0_1px_0_rgba(255,255,255,0.7)]'
+    : 'bg-violet-500/85 border-violet-300/70 text-white shadow-[0_4px_16px_rgba(139,92,246,0.35),inset_0_1px_0_rgba(255,255,255,0.3)]';
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-2 rounded-2xl px-3.5 py-2.5 text-sm font-semibold select-none
+                  backdrop-blur-xl border transition-all active:scale-95
+                  ${active
+                    ? activeStyle
+                    : 'bg-white/55 border-white/70 text-gray-600 shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)]'
+                  }`}
+    >
+      <span className={`w-4.5 h-4.5 w-[18px] h-[18px] rounded-md flex items-center justify-center shrink-0 transition-colors ${
+        active
+          ? color === 'amber' ? 'bg-amber-600/80' : 'bg-violet-700/80'
+          : 'border-2 border-gray-300 bg-white/40'
+      }`}>
+        {active && <Check size={11} strokeWidth={3} className="text-white" />}
+      </span>
+      {children}
+    </button>
+  );
+}
+
+// ─── main component ───────────────────────────────────────────────────────────
+
 export default function SearchClient({ list }) {
-  const [query, setQuery] = useState('');
-  const [region, setRegion] = useState('all');
-  const [game, setGame] = useState('all');
-  const [showMega, setShowMega] = useState(false);
-  const [page, setPage] = useState(1);
+  const [query,    setQuery]    = useState('');
+  const [region,   setRegion]   = useState('all');
+  const [game,     setGame]     = useState('all');
+  const [megaOnly, setMegaOnly] = useState(false);
+  const [altOnly,  setAltOnly]  = useState(false);
+  const [page,     setPage]     = useState(1);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const regionFilter = REGIONS.find((r) => r.value === region);
     const gameFilter   = GAMES.find((g) => g.value === game);
 
-    const inRange = (id) => {
-      if (regionFilter?.value !== 'all' && (id < regionFilter.min || id > regionFilter.max)) return false;
-      if (gameFilter?.value   !== 'all' && (id < gameFilter.min   || id > gameFilter.max))   return false;
+    const matchesRange = (id) => {
+      if (regionFilter?.value !== 'all') {
+        if (id < regionFilter.min || id > regionFilter.max) return false;
+      }
+      if (gameFilter?.value !== 'all') {
+        if (gameFilter.set) {
+          if (!gameFilter.set.has(id)) return false;
+        } else {
+          if (id < gameFilter.min || id > gameFilter.max) return false;
+        }
+      }
       return true;
     };
 
-    const base = list.filter((p) => {
+    const baseFiltered = list.filter((p) => {
       if (q && !(p.jaName.includes(q) || p.name.includes(q) || String(p.id).includes(q))) return false;
-      return inRange(p.id);
+      return matchesRange(p.id);
     });
 
-    if (!showMega) return base;
-
-    const megas = MEGA_LIST.filter((p) => {
+    const megaFiltered = MEGA_LIST.filter((p) => {
       if (q && !(p.jaName.includes(q) || String(p.id).includes(q))) return false;
-      return inRange(p.id);
+      return matchesRange(p.id);
     });
 
-    return [...base, ...megas].sort((a, b) => {
+    const combined = [...baseFiltered, ...megaFiltered].sort((a, b) => {
       if (a.id !== b.id) return a.id - b.id;
       if (!a.isMega && b.isMega) return -1;
       if (a.isMega && !b.isMega) return 1;
       return a.jaName.localeCompare(b.jaName, 'ja');
     });
-  }, [query, region, game, showMega, list]);
+
+    return combined.filter((p) => {
+      if (megaOnly && !p.isMega) return false;
+      if (altOnly && !p.isMega && !ALT_FORM_IDS.has(p.id)) return false;
+      return true;
+    });
+  }, [query, region, game, megaOnly, altOnly, list]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const reset = () => setPage(1);
-
-  const pages = visiblePages(page, totalPages);
+  const reset      = () => setPage(1);
+  const pages      = visiblePages(page, totalPages);
 
   return (
     <div>
@@ -178,55 +272,48 @@ export default function SearchClient({ list }) {
         <GlassSelect value={game}   onChange={(v) => { setGame(v);   reset(); }} options={GAMES}   label="ゲーム" />
       </div>
 
-      {/* メガシンカ チェックボックス */}
-      <div className="px-4 pb-4">
-        <button
-          type="button"
-          onClick={() => { setShowMega((v) => !v); reset(); }}
-          className={`flex items-center gap-2.5 rounded-2xl px-4 py-2.5 text-sm font-semibold select-none
-                      transition-all active:scale-95
-                      ${showMega
-                        ? 'bg-amber-400/80 backdrop-blur-xl border border-amber-300/70 text-amber-900 shadow-[0_4px_16px_rgba(251,191,36,0.35),inset_0_1px_0_rgba(255,255,255,0.7)]'
-                        : 'bg-white/55 backdrop-blur-xl border border-white/70 text-gray-600 shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)]'
-                      }`}
-        >
-          <span className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors shrink-0 ${
-            showMega ? 'bg-amber-600/80 border border-amber-500' : 'border-2 border-gray-300 bg-white/40'
-          }`}>
-            {showMega && <Check size={13} strokeWidth={3} className="text-white" />}
-          </span>
-          <Sparkles size={15} className={showMega ? 'text-amber-700' : 'text-gray-400'} />
-          メガシンカを表示
-        </button>
+      {/* 絞り込みチェック */}
+      <div className="px-4 pb-4 flex gap-2 flex-wrap">
+        <FilterChip color="amber"  active={megaOnly} onClick={() => { setMegaOnly(v => !v); reset(); }}>
+          メガシンカのみ
+        </FilterChip>
+        <FilterChip color="violet" active={altOnly}  onClick={() => { setAltOnly(v => !v);  reset(); }}>
+          別の姿があるもの
+        </FilterChip>
       </div>
 
       {/* グリッド */}
       <div className="px-4 grid grid-cols-3 gap-3">
         {paginated.map((p) => {
           const displayNo = `No.${String(p.id).padStart(4, '0')}${p.isMega ? 'x' : ''}`;
+          const imgId = p.isMega ? p.spriteId : p.id;
+          const isAlt = !p.isMega && ALT_FORM_IDS.has(p.id);
           return (
             <Link key={p.isMega ? p.megaKey : p.id} href={`/pokemon/${p.id}`}>
               <div className={`rounded-2xl p-2 text-center backdrop-blur-xl border active:scale-95 transition-transform duration-100
                 ${p.isMega
                   ? 'bg-amber-50/70 border-amber-200/70 shadow-[0_4px_16px_rgba(251,191,36,0.20),inset_0_1px_0_rgba(255,255,255,0.9)]'
-                  : 'bg-white/55 border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.8)]'
+                  : isAlt
+                    ? 'bg-violet-50/70 border-violet-200/60 shadow-[0_4px_16px_rgba(139,92,246,0.12),inset_0_1px_0_rgba(255,255,255,0.9)]'
+                    : 'bg-white/55 border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.8)]'
                 }`}
               >
                 <div className="relative w-full aspect-square">
                   <Image
-                    src={officialArtwork(p.isMega ? p.spriteId : p.id)}
+                    src={officialArtwork(imgId)}
                     alt={p.jaName}
                     fill
                     className="object-contain drop-shadow"
                     unoptimized
                   />
                   {p.isMega && (
-                    <span className="absolute top-0.5 right-0.5 text-[8px] font-black bg-amber-400 text-white px-1 py-0.5 rounded-full leading-none">
-                      MEGA
-                    </span>
+                    <span className="absolute top-0.5 right-0.5 text-[8px] font-black bg-amber-400 text-white px-1 py-0.5 rounded-full leading-none">MEGA</span>
+                  )}
+                  {isAlt && (
+                    <span className="absolute top-0.5 right-0.5 text-[8px] font-black bg-violet-400 text-white px-1 py-0.5 rounded-full leading-none">別姿</span>
                   )}
                 </div>
-                <p className={`text-[10px] font-mono mt-1 ${p.isMega ? 'text-amber-600' : 'text-gray-400'}`}>
+                <p className={`text-[10px] font-mono mt-1 ${p.isMega ? 'text-amber-600' : isAlt ? 'text-violet-500' : 'text-gray-400'}`}>
                   {displayNo}
                 </p>
                 <p className="text-xs font-bold text-gray-700 truncate">{p.jaName}</p>
@@ -246,9 +333,7 @@ export default function SearchClient({ list }) {
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
             className="w-9 h-9 rounded-full bg-white/55 backdrop-blur-xl border border-white/70 shadow-[0_2px_10px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)] text-sm font-bold text-gray-600 disabled:opacity-40 active:scale-90 transition-transform"
-          >
-            ←
-          </button>
+          >←</button>
 
           {pages.map((n, i) => (
             <Fragment key={n}>
@@ -262,9 +347,7 @@ export default function SearchClient({ list }) {
                     ? 'bg-red-500 text-white shadow-[0_4px_14px_rgba(239,68,68,0.45)]'
                     : 'bg-white/55 backdrop-blur-xl border border-white/70 text-gray-600 shadow-[0_2px_10px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)]'
                 }`}
-              >
-                {n}
-              </button>
+              >{n}</button>
             </Fragment>
           ))}
 
@@ -272,9 +355,7 @@ export default function SearchClient({ list }) {
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
             className="w-9 h-9 rounded-full bg-white/55 backdrop-blur-xl border border-white/70 shadow-[0_2px_10px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.85)] text-sm font-bold text-gray-600 disabled:opacity-40 active:scale-90 transition-transform"
-          >
-            →
-          </button>
+          >→</button>
         </div>
       )}
     </div>
