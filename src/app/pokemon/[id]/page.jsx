@@ -10,6 +10,7 @@ import {
 } from '@/lib/pokeapi';
 import TypeBadge from '@/components/TypeBadge';
 import BackButton from '@/components/BackButton';
+import { getMegasForBase } from '@/lib/forms';
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -340,6 +341,7 @@ async function MovesSection({ moves }) {
 function EvoChain({ node, currentId, itemNameMap, moveNameMap }) {
   const isCurrent = node.id === currentId;
   const condition = node.details?.[0] ? getEvoCondition(node.details[0], itemNameMap, moveNameMap) : null;
+  const megas = getMegasForBase(node.id);
 
   return (
     <div className="flex flex-col items-center">
@@ -364,6 +366,32 @@ function EvoChain({ node, currentId, itemNameMap, moveNameMap }) {
           ))}
         </div>
       )}
+      {megas.length > 0 && (
+        <div className="flex flex-wrap justify-center gap-2 mt-1">
+          {megas.map((m) => (
+            <MegaNode key={m.spriteId} baseId={node.id} spriteId={m.spriteId} jaName={m.jaName} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MegaNode({ baseId, spriteId, jaName }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center my-1">
+        <span className="text-amber-300 text-base">↓</span>
+        <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">メガシンカ</span>
+      </div>
+      <Link href={`/pokemon/${baseId}`}>
+        <div className="flex flex-col items-center px-3 py-2 rounded-2xl bg-amber-50/60 hover:bg-amber-50 transition-colors">
+          <div className="w-16 h-16 flex items-center justify-center overflow-visible">
+            <Image src={officialArtwork(spriteId)} alt={jaName} width={64} height={64} className="drop-shadow object-contain" unoptimized />
+          </div>
+          <p className="text-xs font-bold text-amber-700 mt-1">{jaName}</p>
+        </div>
+      </Link>
     </div>
   );
 }
