@@ -1,11 +1,13 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles, BookOpen } from 'lucide-react';
+import { Sparkles, Search, BookOpen, Table2 } from 'lucide-react';
 
 const TABS = [
-  { href: '/',        label: '診断', Icon: Sparkles },
-  { href: '/pokedex', label: '図鑑', Icon: BookOpen  },
+  { href: '/',       label: '診断',   Icon: Sparkles },
+  { href: '/search', label: '検索',   Icon: Search   },
+  { href: '/pokedex',label: '図鑑',   Icon: BookOpen  },
+  { href: '/types',  label: 'タイプ表', Icon: Table2   },
 ];
 
 export default function TabBar() {
@@ -13,7 +15,10 @@ export default function TabBar() {
 
   function isActive(href) {
     if (href === '/') return pathname === '/' || pathname.startsWith('/result');
-    return pathname === href || pathname.startsWith(href + '/') || pathname.startsWith('/pokemon');
+    if (href === '/search') return pathname.startsWith('/search');
+    if (href === '/pokedex') return pathname === '/pokedex' || pathname.startsWith('/pokemon');
+    if (href === '/types') return pathname.startsWith('/types');
+    return false;
   }
 
   return (
