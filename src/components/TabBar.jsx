@@ -23,10 +23,11 @@ export default function TabBar() {
 
   return (
     <nav
-      className="fixed left-1/2 -translate-x-1/2 bottom-3 z-50 w-[90%] max-w-md flex items-stretch px-2 py-2
-                 rounded-[2rem] bg-white/45 backdrop-blur-2xl border border-white/60
-                 shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.9)]"
-      style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed left-0 right-0 bottom-0 z-50 flex items-stretch px-3 pt-2
+                 rounded-t-[2.5rem] bg-white/50 backdrop-blur-2xl
+                 border-t border-x border-white/60
+                 shadow-[0_-8px_32px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.9)]"
+      style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
     >
       {TABS.map(({ href, label, Icon }) => {
         const active = isActive(href);
