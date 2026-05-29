@@ -1,4 +1,4 @@
-import { fetchPokemonList, fetchSpecies, getIdFromUrl, getJaName } from '@/lib/pokeapi';
+import { fetchPokemonList, fetchSpecies, getIdFromUrl, getJaName, mapLimit } from '@/lib/pokeapi';
 import PokedexSearch from '@/components/PokedexSearch';
 import BackButton from '@/components/BackButton';
 
@@ -11,8 +11,9 @@ export default async function PokedexPage() {
     name: p.name,
   }));
 
-  // Fetch all species in parallel for Japanese names (cached for 1h)
-  const speciesData = await Promise.all(baseList.map((p) => fetchSpecies(p.id)));
+  // Fetch all species for Japanese names (cached 1h), capped at 40 concurrent
+  // requests so the build doesn't exhaust sockets / hit rate limits.
+  const speciesData = await mapLimit(baseList, 40, (p) => fetchSpecies(p.id));
 
   const list = baseList.map((p, i) => ({
     ...p,

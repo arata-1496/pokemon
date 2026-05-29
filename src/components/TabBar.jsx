@@ -23,7 +23,7 @@ export default function TabBar() {
 
   return (
     <nav
-      className="fixed left-1/2 -translate-x-1/2 bottom-3 z-50 flex items-stretch gap-1 px-2 py-2
+      className="fixed left-1/2 -translate-x-1/2 bottom-3 z-50 w-[90%] max-w-md flex items-stretch px-2 py-2
                  rounded-[2rem] bg-white/45 backdrop-blur-2xl border border-white/60
                  shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.9)]"
       style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
@@ -34,7 +34,7 @@ export default function TabBar() {
           <Link
             key={href}
             href={href}
-            className={`flex flex-col items-center justify-center gap-0.5 rounded-3xl px-4 py-2 transition-all duration-200 active:scale-90 ${
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 mx-0.5 rounded-3xl py-2.5 transition-all duration-200 active:scale-90 ${
               active
                 ? 'bg-red-500 shadow-[0_4px_14px_rgba(239,68,68,0.45)]'
                 : ''

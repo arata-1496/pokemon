@@ -2,9 +2,31 @@ const BASE = 'https://pokeapi.co/api/v2';
 const OPT = { next: { revalidate: 3600 } };
 
 async function get(url) {
-  const r = await fetch(url, OPT);
-  if (!r.ok) return null;
-  return r.json();
+  try {
+    const r = await fetch(url, OPT);
+    if (!r.ok) return null;
+    return r.json();
+  } catch {
+    // Network error (e.g. socket exhaustion during large build-time fan-out).
+    // Degrade gracefully instead of crashing the whole page render.
+    return null;
+  }
+}
+
+// Run an async mapper over items with a bounded concurrency so we never open
+// 1000+ sockets at once (which fails Vercel's build). Order is preserved.
+export async function mapLimit(items, limit, mapper) {
+  const results = new Array(items.length);
+  let cursor = 0;
+  async function worker() {
+    while (cursor < items.length) {
+      const i = cursor++;
+      results[i] = await mapper(items[i], i);
+    }
+  }
+  const workers = Array.from({ length: Math.min(limit, items.length) }, worker);
+  await Promise.all(workers);
+  return results;
 }
 
 export const fetchPokemon = (id) => get(`${BASE}/pokemon/${id}`);

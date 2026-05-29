@@ -1,4 +1,4 @@
-import { fetchPokemonList, fetchSpecies, getIdFromUrl, getJaName } from '@/lib/pokeapi';
+import { fetchPokemonList, fetchSpecies, getIdFromUrl, getJaName, mapLimit } from '@/lib/pokeapi';
 import SearchClient from '@/components/SearchClient';
 import BackButton from '@/components/BackButton';
 
@@ -11,7 +11,7 @@ export default async function SearchPage() {
     name: p.name,
   }));
 
-  const speciesData = await Promise.all(baseList.map((p) => fetchSpecies(p.id)));
+  const speciesData = await mapLimit(baseList, 40, (p) => fetchSpecies(p.id));
 
   const list = baseList.map((p, i) => ({
     ...p,
