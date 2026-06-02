@@ -378,9 +378,9 @@ function EvoChain({ node, currentId, itemNameMap, moveNameMap }) {
         </div>
       )}
       <Link href={`/pokemon/${node.id}`}>
-        <div className={`flex flex-col items-center px-3 py-2 rounded-2xl transition-colors ${isCurrent ? 'bg-red-50 ring-2 ring-red-300' : 'hover:bg-gray-50'}`}>
-          <div className="w-16 h-16 flex items-center justify-center overflow-visible">
-            <Image src={officialArtwork(node.id)} alt={node.jaName || node.name} width={64} height={64} className="drop-shadow object-contain" unoptimized />
+        <div className={`flex flex-col items-center px-1 py-1 rounded-2xl transition-colors ${isCurrent ? 'bg-red-50 ring-2 ring-red-300' : 'hover:bg-gray-50'}`}>
+          <div className="w-24 h-24 flex items-center justify-center overflow-visible">
+            <Image src={officialArtwork(node.id)} alt={node.jaName || node.name} width={96} height={96} className="drop-shadow object-contain" unoptimized />
           </div>
           <p className="text-xs font-bold text-gray-700 mt-1">{node.jaName || node.name}</p>
         </div>
@@ -411,9 +411,9 @@ function MegaNode({ spriteId, jaName }) {
         <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">メガシンカ</span>
       </div>
       <Link href={`/pokemon/${spriteId}`}>
-        <div className="flex flex-col items-center px-3 py-2 rounded-2xl bg-amber-50/60 hover:bg-amber-100 transition-colors">
-          <div className="w-16 h-16 flex items-center justify-center overflow-visible">
-            <Image src={officialArtwork(spriteId)} alt={jaName} width={64} height={64} className="drop-shadow object-contain" unoptimized />
+        <div className="flex flex-col items-center px-1 py-1 rounded-2xl bg-amber-50/60 hover:bg-amber-100 transition-colors">
+          <div className="w-24 h-24 flex items-center justify-center overflow-visible">
+            <Image src={officialArtwork(spriteId)} alt={jaName} width={96} height={96} className="drop-shadow object-contain" unoptimized />
           </div>
           <p className="text-xs font-bold text-amber-700 mt-1">{jaName}</p>
         </div>
