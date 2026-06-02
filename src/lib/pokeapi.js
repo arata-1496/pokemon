@@ -47,6 +47,19 @@ export function getJaName(names = []) {
   );
 }
 
+// とくせいの日本語説明文（flavor_text_entries → effect_entries の順でフォールバック）
+export function getJaAbilityEffect(abilityData) {
+  if (!abilityData) return '';
+  const flavor = abilityData.flavor_text_entries
+    ?.filter((e) => e.language.name === 'ja-Hrkt' || e.language.name === 'ja')
+    ?.at(-1)
+    ?.flavor_text?.replace(/[­\n]/g, '') ?? '';
+  if (flavor) return flavor;
+  return abilityData.effect_entries
+    ?.find((e) => e.language.name === 'ja')
+    ?.short_effect ?? '';
+}
+
 export function getFlavorText(entries = []) {
   return (
     entries

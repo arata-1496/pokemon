@@ -4,13 +4,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   fetchPokemon, fetchSpecies, fetchType, fetchMove, fetchEvolutionChain, fetchAbility,
-  getJaName, getFlavorText, getIdFromUrl, officialArtwork,
+  getJaName, getJaAbilityEffect, getFlavorText, getIdFromUrl, officialArtwork,
   calcTypeMatchup, addNamesToChain, collectChainIds, collectEvoItemUrls, collectEvoMoveUrls, getEvoCondition,
   STAT_NAMES_JA, DAMAGE_CLASS_JA,
 } from '@/lib/pokeapi';
 import TypeBadge from '@/components/TypeBadge';
 import BackButton from '@/components/BackButton';
 import PokemonImage from '@/components/PokemonImage';
+import AbilityChip from '@/components/AbilityChip';
 import { getMegasForBase, getFormInfo } from '@/lib/forms';
 
 export async function generateMetadata({ params }) {
@@ -196,12 +197,12 @@ async function StatsSection({ pokemon }) {
   const abilityData = await Promise.all(
     pokemon.abilities.map((a) => fetchAbility(a.ability.name))
   );
-  const abilityNameMap = Object.fromEntries(
-    pokemon.abilities.map((a, i) => [
-      a.ability.name,
-      getJaName(abilityData[i]?.names ?? []) || a.ability.name,
-    ])
-  );
+  const abilities = pokemon.abilities.map((a, i) => ({
+    name:     a.ability.name,
+    isHidden: a.is_hidden,
+    jaName:   getJaName(abilityData[i]?.names ?? []) || a.ability.name,
+    jaEffect: getJaAbilityEffect(abilityData[i]),
+  }));
 
   return (
     <Section title="基本情報">
@@ -210,20 +211,15 @@ async function StatsSection({ pokemon }) {
         <InfoBox label="おもさ" value={`${(pokemon.weight / 10).toFixed(1)} kg`} />
       </div>
 
-      <p className="text-xs text-gray-400 mb-2">とくせい</p>
+      <p className="text-xs text-gray-400 mb-2">とくせい <span className="font-normal opacity-60">（タップで効果を表示）</span></p>
       <div className="flex flex-wrap gap-2 mb-4">
-        {pokemon.abilities.map((a) => (
-          <span
-            key={a.ability.name}
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              a.is_hidden
-                ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                : 'bg-gray-100 text-gray-700'
-            }`}
-          >
-            {abilityNameMap[a.ability.name] ?? a.ability.name}
-            {a.is_hidden && <span className="text-xs ml-1 opacity-70">(かくれ)</span>}
-          </span>
+        {abilities.map((a) => (
+          <AbilityChip
+            key={a.name}
+            jaName={a.jaName}
+            jaEffect={a.jaEffect}
+            isHidden={a.isHidden}
+          />
         ))}
       </div>
 
